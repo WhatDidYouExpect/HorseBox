@@ -1,0 +1,27 @@
+"GameInfo"
+{
+	game	"JBMod:CE"
+	title	"JBMod:CE"
+	title2	"0.0.1"
+	FileSystem
+	{
+		SteamAppId				243750		// This will mount all the GCFs we need (240=CS:S, 220=HL2).
+		
+		SearchPaths
+		{
+			game+mod			|gameinfo_path|
+			game+mod			hl2mp
+			game+mod			hl2mp/hl2mp_pak.vpk
+			game				|all_source_engine_paths|hl2/hl2_textures.vpk
+			game				|all_source_engine_paths|hl2/hl2_sound_vo_english.vpk
+			game				|all_source_engine_paths|hl2/hl2_sound_misc.vpk
+			game				|all_source_engine_paths|hl2/hl2_misc.vpk
+			gamebin				|gameinfo_path|bin
+			
+			platform			|all_source_engine_paths|platform/platform_misc.vpk
+
+			game				|all_source_engine_paths|hl2
+			platform			|all_source_engine_paths|platform
+		}
+	}
+}
