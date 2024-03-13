@@ -757,7 +757,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"  "jbmod"
+				"name"  "Trebuchet MS"
 				"tall"  "46"
 				"weight" "0"
 				"additive" "0"
