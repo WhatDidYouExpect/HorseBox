@@ -179,5 +179,10 @@ $Project "Client"
 				$File	"hl2mp\hud_deathnotice.cpp"
 			}
 		}
+		
+		$Folder "JBMod"
+		{
+			$File	"$SRCDIR\game\client\hl2\c_weapon_gravitygun.cpp"
+		}
 	}
 }

@@ -300,5 +300,10 @@ $Project "Server"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_stunstick.cpp"
 			}
 		}
+		
+		$Folder "JBMod"
+		{
+			$File	"$SRCDIR\game\server\physgun.cpp"
+		}
 	}
 }
