@@ -25,7 +25,7 @@
 #include "tier0/memdbgon.h"
 
 ConVar phys_gunmass("phys_gunmass", "200");
-ConVar phys_gunvel("phys_gunvel", "400");
+ConVar phys_gunvel("phys_gunvel", "999");
 ConVar phys_gunforce("phys_gunforce", "5e5" );
 ConVar phys_guntorque("phys_guntorque", "100" );
 ConVar phys_gunglueradius("phys_gunglueradius", "128" );
@@ -33,7 +33,7 @@ ConVar phys_gunglueradius("phys_gunglueradius", "128" );
 static int g_physgunBeam;
 #define PHYSGUN_BEAM_SPRITE		"sprites/physbeam.vmt"
 
-#define MAX_PELLETS	16
+#define MAX_PELLETS	999
 
 class CWeaponGravityGun;
 
@@ -46,7 +46,8 @@ public:
 	~CGravityPellet();
 	void Precache()
 	{
-		SetModelName( MAKE_STRING( "models/weapons/glueblob.mdl" ) );
+		SetModelName( MAKE_STRING( "models/props_junk/watermelon01.mdl" ) );
+		//SetModelName(MAKE_STRING("models/weapons/w_bugbait.mdl"));
 		PrecacheModel( STRING( GetModelName() ) );
 		BaseClass::Precache();
 	}

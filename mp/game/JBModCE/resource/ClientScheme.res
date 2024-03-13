@@ -463,7 +463,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"Verdana Bold"
+				"name"		"jbmod"
 				"tall"		"18"
 				"weight"	"500"
 			}
@@ -757,7 +757,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"  "HL2MP"
+				"name"  "Trebuchet MS"
 				"tall"  "46"
 				"weight" "0"
 				"additive" "0"
@@ -1578,6 +1578,7 @@ Scheme
 		"1"		"resource/HALFLIFE2.ttf"
 		"1"		"resource/HL2MP.ttf"
 		"2"		"resource/HL2crosshairs.ttf"
+		"3"		"resource/jbmod.ttf"
 	}
 
 }
