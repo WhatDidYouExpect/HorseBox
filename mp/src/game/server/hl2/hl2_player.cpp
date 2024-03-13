@@ -77,7 +77,7 @@ extern ConVar autoaim_max_dist;
 
 extern int gEvilImpulse101;
 
-ConVar sv_autojump( "sv_autojump", "0" );
+//ConVar sv_autojump( "sv_autojump", "0" );
 
 ConVar hl2_walkspeed( "hl2_walkspeed", "150" );
 ConVar hl2_normspeed( "hl2_normspeed", "190" );
@@ -600,6 +600,7 @@ void CHL2_Player::PreThink(void)
 		return;
 	}
 
+	/*
 	// This is an experiment of mine- autojumping! 
 	// only affects you if sv_autojump is nonzero.
 	if( (GetFlags() & FL_ONGROUND) && sv_autojump.GetFloat() != 0 )
@@ -642,7 +643,7 @@ void CHL2_Player::PreThink(void)
 			}
 		}
 	}
-
+	*/
 	VPROF_SCOPE_BEGIN( "CHL2_Player::PreThink-Speed" );
 	HandleSpeedChanges();
 #ifdef HL2_EPISODIC
