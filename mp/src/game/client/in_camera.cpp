@@ -893,26 +893,13 @@ int CInput::CAM_InterceptingMouse( void )
 	return m_fCameraInterceptingMouse;
 }
 
-static ConCommand startpitchup( "+campitchup", CAM_PitchUpDown );
-static ConCommand endpitcup( "-campitchup", CAM_PitchUpUp );
-static ConCommand startpitchdown( "+campitchdown", CAM_PitchDownDown );
-static ConCommand endpitchdown( "-campitchdown", CAM_PitchDownUp );
-static ConCommand startcamyawleft( "+camyawleft", CAM_YawLeftDown );
-static ConCommand endcamyawleft( "-camyawleft", CAM_YawLeftUp );
-static ConCommand startcamyawright( "+camyawright", CAM_YawRightDown );
-static ConCommand endcamyawright( "-camyawright", CAM_YawRightUp );
-static ConCommand startcamin( "+camin", CAM_InDown );
-static ConCommand endcamin( "-camin", CAM_InUp );
-static ConCommand startcamout( "+camout", CAM_OutDown );
-static ConCommand camout( "-camout", CAM_OutUp );
-static ConCommand thirdperson_mayamode( "thirdperson_mayamode", ::CAM_ToThirdPerson_MayaMode, "Switch to thirdperson Maya-like camera controls.", FCVAR_CHEAT );
-
+//if youre looking for the maya controls i removed it 
 // TF allows servers to push people into first/thirdperson, for mods
 #ifdef TF_CLIENT_DLL
 static ConCommand thirdperson( "thirdperson", ::CAM_ToThirdPerson, "Switch to thirdperson camera.", FCVAR_CHEAT | FCVAR_SERVER_CAN_EXECUTE );
 static ConCommand firstperson( "firstperson", ::CAM_ToFirstPerson, "Switch to firstperson camera.", FCVAR_SERVER_CAN_EXECUTE );
 #else
-static ConCommand thirdperson( "thirdperson", ::CAM_ToThirdPerson, "Switch to thirdperson camera.", FCVAR_CHEAT );
+static ConCommand thirdperson( "thirdperson", ::CAM_ToThirdPerson, "Switch to thirdperson camera." );
 static ConCommand firstperson( "firstperson", ::CAM_ToFirstPerson, "Switch to firstperson camera." );
 #endif
 static ConCommand camortho( "camortho", ::CAM_ToOrthographic, "Switch to orthographic camera.", FCVAR_CHEAT );
