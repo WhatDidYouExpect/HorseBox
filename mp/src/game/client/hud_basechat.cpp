@@ -5,6 +5,105 @@
 // $NoKeywords: $
 //=============================================================================//
 
+//Take me on home to the asylum.
+//Never alone in the asylum.
+//Anarchy ruled, it was wild.
+//But through it all, you never smiled.
+//Joke's on you, I'm in your head so
+//Look who's laughing now!
+//Remember in Arkham City
+//I killed your girl, so pretty
+//That was the night you let me die
+//But when I looked you in the eye
+//That's when I knew we'd be together
+//Look who's laughing now!
+//I'm stuck in your head and I'm laughing!
+//I filled you with dread and I can't stop laughing!
+//Your parents are dead and I can't stop laughing!
+//What else can I do ?
+//Now I'm part of you.
+//I am the clown prince of crime
+//And we've had a hell of a time.
+//You're part of me, I'm part of you
+//And now there's nothing left to do
+//I just can't wait till I'm in control
+//Who'll be laughing then?
+//I drove you round the bend and I'm laughing
+//I'm with you to the end and I can't stop laughing
+//I killed all of your friends and I can't stop laughing
+//[LAUGHTER]
+//Oh yeah!
+//Think I can taste your fear
+//Now that my time is near
+//I'm in your blood, I'm so alive
+//I only wish you'd let me drive
+//It won't be long till I make you kill
+//Who'll be laughing then?
+//Barbara's dead and I'm laughing(HA!)
+//Jason Todd's dead and I can't stop laughing
+//I'm even dead and I can't stop laughing!
+//What else can I do ?
+//Now I'm part of you
+//I drove you round the bend and I'm laughing!
+//I'm with you to the end and I can't stop laughing!
+//I killed all of your friends and I can't stop laughing!
+//I'm cock-a-doodle-do!
+//All because of you.
+//I'm stuck in your head and I'm laughing!
+//I filled you with dread and I can't stop laughing!
+//Your parents are dead and I can't stop laughing!
+//[LAUGHTER]
+//I'm stuck in your head and I'm laughing!
+//I filled you with dread and I can't stop laughing!
+//Your parents are dead and I can't stop laughing!
+//What else can I do ?
+//Now I'm part of you..
+//Credits Version
+//And so I'm home in the Asylum.
+//Ever alone in the Asylum.
+//"No, don't leave me!" I cried
+//Now I'm locked deep inside
+//His subconscious trapped forever
+//Look who's laughing now [Laughs Faintly]
+//I was the clown prince of crime
+//He was the next in line
+//I was him, and he was me
+//Oh what a Joker he could be
+//Now the darkness closes in
+//No one's laughing now [Laughing mixed with crying]
+//I'm stuck in his head and not laughing
+//I'd be better off dead and I'm not laughing
+//I begged and I plead but he stopped me laughing
+//If you only knew the things I'd do for you
+//I was the ace of knaves
+//He was my king of spades
+//What a pair suits clashed in style
+//It could have worked, this Joker's wild
+//Ooh I felt so clashed together
+//Look who's laughing now
+//I'm stuck in his head and not laughing
+//I'd be better off dead and I'm not laughing
+//Take Robin instead, then I'd be laughing
+//I'm finished, done I'm through
+//All because of you
+//It was my final tour
+//Always leave them wanting more
+//But before the curtain call
+//Make sure you try and slay em' all
+//Nothing good can last forever
+//No one's laughing now [laughing mixed with crying]
+//I'm stuck in his head and not laughing
+//I'd be better off dead and I'm not laughing
+//I begged and I plead but he stopped me laughing
+//Oh, what can I do ?
+//So near, yet far from you[Continues to laugh but then breaks down sobbing]
+//You're a great crowd. I'll be here all week; try the veal.
+ 
+ 
+
+//reference to me figuring out how to change the chat color
+//(it took me 2 months
+
 #include "cbase.h"
 #include "hud_basechat.h"
 
