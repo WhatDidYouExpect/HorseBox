@@ -16,7 +16,7 @@ WeaponData
 	"default_clip2"			"-1"
 
 	"primary_ammo"			"None"
-	"secondary_ammo"		"None"
+	"secondary_ammo"		"Gravity"
 
 	"weight"				"0"
 	"item_flags"			"2"
