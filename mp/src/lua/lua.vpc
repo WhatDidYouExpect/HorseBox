@@ -1,5 +1,5 @@
 $Macro SRCDIR		".."
-$Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro OUTBINDIR	"$SRCDIR\..\game\jbmodce\bin"
 $Macro OUTBINNAME	"lua"
 
 
@@ -9,7 +9,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories  	"$BASE;..\"
+		$AdditionalIncludeDirectories  	"$BASE;..\;..\public\lua;..\public"
 		$DisableSpecificWarnings			"4244;4310;4701;4702;4530;$BASE"
 	}
 	
@@ -49,6 +49,7 @@ $Project "lua"
 		$File	"lbaselib.c"
 		$File	"lauxlib.c"
 		$File	"lapi.c"
+		$File	"lua.cpp"
 	}
 }
 

@@ -89,7 +89,7 @@
 #include "tier3/tier3.h"
 #include "serverbenchmark_base.h"
 #include "querycache.h"
-
+#include "lua/lua.h"
 
 #ifdef TF_DLL
 #include "gc_clientsystem.h"
@@ -183,6 +183,7 @@ IServerEngineTools *serverenginetools = NULL;
 ISceneFileCache *scenefilecache = NULL;
 IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;	// Xbox 360 only
+ILua* g_pLua = NULL;
 #if defined( REPLAY_ENABLED )
 IReplaySystem *g_pReplay = NULL;
 IServerReplayContext *g_pReplayServerContext = NULL;
@@ -742,6 +743,16 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// init the gamestatsupload connection
 	gamestatsuploader->InitConnection();
 #endif
+
+	CSysModule* pLuaDLL = g_pFullFileSystem->LoadModule("lua", "GAMEBIN", false);
+	if (pLuaDLL != nullptr)
+	{
+		CreateInterfaceFn gamepaduiFactory = Sys_GetFactory(pLuaDLL);
+		if (gamepaduiFactory != nullptr)
+		{
+			g_pLua = (ILua*)gamepaduiFactory(INTERFACELUA_VERSION, NULL);
+		}
+	}
 
 	return true;
 }
