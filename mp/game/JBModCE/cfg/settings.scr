@@ -45,7 +45,7 @@ DESCRIPTION SERVER_OPTIONS
 	{
 		"#Valve_Hostname"
 		{ STRING }
-		{ "JBModCE" }
+		{ "JBMod:CE" }
 	}
 
 	"sv_password"
