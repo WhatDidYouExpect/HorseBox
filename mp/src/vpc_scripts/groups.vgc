@@ -23,6 +23,7 @@ $Group "game"
 	"tier1"
 	"vgui_controls"
 	"launcher"
+	"lua"
 }
 
 $Group "shaders"
@@ -58,6 +59,7 @@ $Group "everything"
 	"vvis_launcher"
 	"togl"
 	"launcher"
+	"lua"
 }
 
 $Group "dedicated"

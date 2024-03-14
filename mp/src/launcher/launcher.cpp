@@ -20,6 +20,9 @@ bool DesiredApp(int appid)
 	case 320: //hl2dm
 	case 400: //portal
 	case 420: //ep2
+	//case 1583720: //ez2
+	//case 714070: //ez1
+	//case 620: //p2
 		return true;
 	default:
 		return false;
@@ -111,10 +114,10 @@ void GetAppManifest(const char* appid, const char* path)
 		PatchSearchPath(searchpaths, "hl2/hl2_misc.vpk", appDir);
 		PatchSearchPath(searchpaths, "platform/platform_misc.vpk", appDir);
 		PatchSearchPath(searchpaths, "platform", appDir);
-		break;
-	case 320: //hl2dm
 		PatchSearchPath(searchpaths, "hl2mp", appDir);
 		PatchSearchPath(searchpaths, "hl2mp/hl2mp_pak.vpk", appDir);
+		break;
+	case 320: //hl2dm
 		break;
 	case 360: //hldm:s
 		PatchSearchPath(searchpaths, "hl1/hl1_pak.vpk", appDir);
@@ -173,13 +176,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	_snprintf(szBuffer, sizeof(szBuffer),"%s\n", g_szBasedir);
 	
 	char steamDir[MAX_PATH];
+	char steamLibraryFolders[MAX_PATH];
 	DWORD BufferSize = 8192;
 	RegGetValue(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Valve\\Steam", "InstallPath", RRF_RT_REG_SZ, NULL, (PVOID)&steamDir, &BufferSize);
 	if (!steamDir)
 		return 1;
-	
-	strncat(steamDir, "\\steamapps\\libraryfolders.vdf", MAX_PATH);
-	KeyValues* libraryfolders = GetKeyvaluesFromFile(steamDir, "libraryfolders");
+	strcpy(steamLibraryFolders,steamDir);
+	strncat(steamLibraryFolders, "\\steamapps\\libraryfolders.vdf", MAX_PATH);
+	KeyValues* libraryfolders = GetKeyvaluesFromFile(steamLibraryFolders, "libraryfolders");
 	char sdk2013dir[MAX_PATH] = "";
 	for (KeyValues* folder = libraryfolders->GetFirstTrueSubKey(); folder; folder = folder->GetNextTrueSubKey())
 	{
@@ -210,6 +214,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	V_AppendSlash(gameParam, MAX_PATH);
 	strncat(gameParam, "jbmodce\"", MAX_PATH);
 
-	ShellExecute(0, "open", sdk2013dir, gameParam, NULL, SW_SHOWDEFAULT);
+	ShellExecute(0, "open", sdk2013dir, gameParam, steamDir, SW_SHOWDEFAULT);
 	return 0;
 }

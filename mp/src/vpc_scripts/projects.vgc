@@ -140,3 +140,8 @@ $Project "launcher"
 {
 	"launcher\launcher.vpc" [$WIN32]
 }
+
+$Project "lua"
+{
+	"lua\lua.vpc" [$WIN32]
+}

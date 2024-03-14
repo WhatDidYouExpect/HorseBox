@@ -1,0 +1,54 @@
+$Macro SRCDIR		".."
+$Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro OUTBINNAME	"lua"
+
+
+$include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories  	"$BASE;..\"
+		$DisableSpecificWarnings			"4244;4310;4701;4702;4530;$BASE"
+	}
+	
+	
+}
+
+
+$Project "lua"
+{
+	$Folder	"Source Files"
+	{
+		$File	"lzio.c"
+		$File	"lvm.c"
+		$File	"lutf8lib.c"
+		$File	"lundump.c"
+		$File	"ltm.c"
+		$File	"ltablib.c"
+		$File	"ltable.c"
+		$File	"lstrlib.c"
+		$File	"lstring.c"
+		$File	"lstate.c"
+		$File	"lparser.c"
+		$File	"lopcodes.c"
+		$File	"lobject.c"
+		$File	"lmem.c"
+		$File	"lmathlib.c"
+		$File	"llex.c"
+		$File	"linit.c"
+		$File	"lgc.c"
+		$File	"lfunc.c"
+		$File	"ldump.c"
+		$File	"ldo.c"
+		$File	"ldebug.c"
+		$File	"lctype.c"
+		$File	"lcorolib.c"
+		$File	"lcode.c"
+		$File	"lbaselib.c"
+		$File	"lauxlib.c"
+		$File	"lapi.c"
+	}
+}
+
