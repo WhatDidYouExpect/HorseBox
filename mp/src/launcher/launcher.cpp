@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <KeyValues.h>
 #include <utlbuffer.h>
+
 static char g_szBasedir[MAX_PATH];
 
 
@@ -135,15 +136,14 @@ void GetAppManifest(const char* appid, const char* path)
 		break;
 	}
 	appmanifest->deleteThis();
-	CUtlBuffer buf;
+	CUtlBuffer buf(0, 0, 0);
 	gameinfo->RecursiveSaveToFile(buf, 0);
-	//Msg((char*)buf.Base());
 	gameinfo->deleteThis();
+	
 	FILE* fp = fopen(gameinfoDir, "w");
 	fwrite(buf.Base(), 1, buf.PeekStringLength(), fp);
 	fclose(fp);
-
-
+	
 }
 
 
