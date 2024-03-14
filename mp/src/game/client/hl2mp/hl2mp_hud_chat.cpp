@@ -100,7 +100,7 @@ Color CHudChat::GetClientColor( int clientIndex )
 {
 	if ( clientIndex == 0 ) // console msg
 	{
-		return g_ColorYellow;
+		return g_ColorWhite;
 	}
 	else if( g_PR )
 	{
@@ -112,5 +112,5 @@ Color CHudChat::GetClientColor( int clientIndex )
 		}
 	}
 
-	return g_ColorYellow;
+	return g_ColorWhite;
 }
