@@ -1,0 +1,43 @@
+//-----------------------------------------------------------------------------
+//	RAYTRACE.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro OUTBINDIR	"$SRCDIR\..\game"
+
+// Must be built explicitly as "default" in order to build a compliant submittable Disc.
+// Renames will not work.
+$Macro OUTBINNAME	"jbmodce"
+
+$Include "$SRCDIR\vpc_scripts\source_exe_win_win32_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\utils\common"
+	}
+	
+	$Linker
+	{
+		$FixedBaseAddress			"Generate a relocation section (/FIXED:NO)" [$WIN32]
+	}
+}
+
+$Project
+{
+	$Folder	"Source Files"
+	{
+		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
+	}
+}
+
+$Project "Launcher"
+{
+	$Folder	"Source Files"
+	{
+		$File	"launcher.cpp"
+	}
+}

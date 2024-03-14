@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME 	"sdk2013ce" [!$SOURCESDK]
-$Macro GAMENAME 	"mod_sdk2013ce" [$SOURCESDK]
+$Macro GAMENAME 	"jbmodce" [!$SOURCESDK]
+$Macro GAMENAME 	"jbmodce" [$SOURCESDK]
 
 $Include "$SRCDIR\game\client\client_base.vpc"
 
@@ -183,6 +183,8 @@ $Project "Client"
 		$Folder "JBMod"
 		{
 			$File	"$SRCDIR\game\client\hl2\c_weapon_gravitygun.cpp"
+			$File	"$SRCDIR\game\client\jbmodce\mountingmenu.cpp"
+			$File	"$SRCDIR\game\client\jbmodce\mountingmenu.h"
 		}
 	}
 }

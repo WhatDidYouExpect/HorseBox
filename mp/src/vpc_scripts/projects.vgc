@@ -135,3 +135,8 @@ $Project "togl"
 {
 	"togl\togl.vpc" [$POSIX]
 }
+
+$Project "launcher"
+{
+	"launcher\launcher.vpc" [$WIN32]
+}

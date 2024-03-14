@@ -87,3 +87,9 @@ compile_commands.json
 !sourcesdk_def.mak
 *.lib
 *.pdb
+*.cache
+mp/game/jbmodce.exe
+*.pdb
+*.lib
+mp/game/JBModCE/materials/vgui/logos/spray.vtf
+mp/game/JBModCE/materials/vgui/logos/spray.vmt
