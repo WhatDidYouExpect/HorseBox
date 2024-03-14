@@ -15,9 +15,9 @@ Scheme
 	Colors
 	{
 		// base colors
-		"Orange"			"255 176 0 255"
-		"OrangeDim"			"255 176 0 120"
-		"LightOrange"		"188 112 0 128"
+		"Orange"			"0 191 255 255"
+		"OrangeDim"			"0 191 255 120"
+		"LightOrange"		"0 191 255 128"
 		
 		"Red"				"192 28 0 140"
 		"Black"				"0 0 0 196"
@@ -36,31 +36,31 @@ Scheme
 	// controls use these to determine their settings
 	BaseSettings
 	{
-		"FgColor"			"255 220 0 100"
+		"FgColor"			"0 191 255 100"
 		"BgColor"			"0 0 0 76"
 
-		"Panel.FgColor"			"255 220 0 100"
+		"Panel.FgColor"			"0 191 255 100"
 		"Panel.BgColor"			"0 0 0 76"
 		
-		"BrightFg"		"255 220 0 255"
+		"BrightFg"		"135 206 250 255"
 
 		"DamagedBg"			"180 0 0 200"
 		"DamagedFg"			"180 0 0 230"
 		"BrightDamagedFg"		"255 0 0 255"
 
 		// weapon selection colors
-		"SelectionNumberFg"		"255 220 0 255"
-		"SelectionTextFg"		"255 220 0 255"
+		"SelectionNumberFg"		"0 191 255 255"
+		"SelectionTextFg"		"0 191 255 255"
 		"SelectionEmptyBoxBg" 	"0 0 0 80"
 		"SelectionBoxBg" 		"0 0 0 80"
 		"SelectionSelectedBoxBg" "0 0 0 80"
 		
-		"ZoomReticleColor"	"255 220 0 255"
+		"ZoomReticleColor"	"0 0 255 255"
 
 		// HL1-style HUD colors
-		"Yellowish"			"255 160 0 255"
-		"Normal"			"255 208 64 255"
-		"Caution"			"255 48 0 255"
+		"Yellowish"			"0 191 255 255"
+		"Normal"			"0 191 255 255"
+		"Caution"			"0 191 255 255"
 
 		// Top-left corner of the "Half-Life 2" on the main screen
 		"Main.Title1.X"		"76"
@@ -82,26 +82,26 @@ Scheme
 
 ///HERE
 				// vgui_controls color specifications
-		Border.Bright					"LightOrange"		// the lit side of a control
-		Border.Dark						"LightOrange"		// the dark/unlit side of a control
+		Border.Bright					"White"		// the lit side of a control
+		Border.Dark						"White"		// the dark/unlit side of a control
 		Border.Selection				"Blank"				// the additional border color for displaying the default/selected button
 
-		Button.TextColor				"Orange"
+		Button.TextColor				"White"
 		Button.BgColor					"Blank"
-		Button.ArmedTextColor			"Orange"
+		Button.ArmedTextColor			"White"
 		Button.ArmedBgColor				"Red"
-		Button.DepressedTextColor		"Orange"
+		Button.DepressedTextColor		"White"
 		Button.DepressedBgColor			"Red"
 
-		CheckButton.TextColor			"Orange"
-		CheckButton.SelectedTextColor	"Orange"
+		CheckButton.TextColor			"White"
+		CheckButton.SelectedTextColor	"White"
 		CheckButton.BgColor				"TransparentBlack"
 		CheckButton.Border1  			"Border.Dark" 		// the left checkbutton border
 		CheckButton.Border2  			"Border.Bright"		// the right checkbutton border
-		CheckButton.Check				"Orange"				// color of the check itself
+		CheckButton.Check				"White"				// color of the check itself
 
-		ComboBoxButton.ArrowColor		"Orange"
-		ComboBoxButton.ArmedArrowColor	"Orange"
+		ComboBoxButton.ArrowColor		"White"
+		ComboBoxButton.ArmedArrowColor	"White"
 		ComboBoxButton.BgColor			"TransparentBlack"
 		ComboBoxButton.DisabledBgColor	"Blank"
 
@@ -120,70 +120,70 @@ Scheme
 		FrameSystemButton.BgColor		"Blank"
 		FrameSystemButton.Icon			""
 		FrameSystemButton.DisabledIcon	""
-		FrameTitleBar.TextColor			"Orange"
+		FrameTitleBar.TextColor			"White"
 		FrameTitleBar.BgColor			"Blank"
-		FrameTitleBar.DisabledTextColor	"Orange"
+		FrameTitleBar.DisabledTextColor	"White"
 		FrameTitleBar.DisabledBgColor	"Blank"
 
 		GraphPanel.FgColor				"Orange"
 		GraphPanel.BgColor				"TransparentBlack"
 
-		Label.TextDullColor				"Orange"
-		Label.TextColor					"Orange"
-		Label.TextBrightColor			"Orange"
-		Label.SelectedTextColor			"Orange"
+		Label.TextDullColor				"White"
+		Label.TextColor					"White"
+		Label.TextBrightColor			"White"
+		Label.SelectedTextColor			"White"
 		Label.BgColor					"Blank"
 		Label.DisabledFgColor1			"Blank"
-		Label.DisabledFgColor2			"LightOrange"
+		Label.DisabledFgColor2			"White"
 
-		ListPanel.TextColor					"Orange"
+		ListPanel.TextColor					"White"
 		ListPanel.BgColor					"TransparentBlack"
 		ListPanel.SelectedTextColor			"Black"
 		ListPanel.SelectedBgColor			"Red"
 		ListPanel.SelectedOutOfFocusBgColor	"Red"
-		ListPanel.EmptyListInfoTextColor	"Orange"
+		ListPanel.EmptyListInfoTextColor	"White"
 
-		Menu.TextColor					"Orange"
+		Menu.TextColor					"White"
 		Menu.BgColor					"TransparentBlack"
-		Menu.ArmedTextColor				"Orange"
+		Menu.ArmedTextColor				"White"
 		Menu.ArmedBgColor				"Red"
 		Menu.TextInset					"6"
 
-		Chat.TypingText					"Orange"
+		Chat.TypingText					"White"
 
-		Panel.FgColor					"OrangeDim"
+		Panel.FgColor					"White"
 		Panel.BgColor					"blank"
 
 		ProgressBar.FgColor				"Orange"
 		ProgressBar.BgColor				"TransparentBlack"
 
-		PropertySheet.TextColor			"Orange"
-		PropertySheet.SelectedTextColor	"Orange"
+		PropertySheet.TextColor			"White"
+		PropertySheet.SelectedTextColor	"White"
 		PropertySheet.TransitionEffectTime	"0.25"	// time to change from one tab to another
 
-		RadioButton.TextColor			"Orange"
-		RadioButton.SelectedTextColor	"Orange"
+		RadioButton.TextColor			"White"
+		RadioButton.SelectedTextColor	"White"
 
-		RichText.TextColor				"Orange"
+		RichText.TextColor				"White"
 		RichText.BgColor				"Blank"
-		RichText.SelectedTextColor		"Orange"
+		RichText.SelectedTextColor		"White"
 		RichText.SelectedBgColor		"Blank"
 
-				ScrollBarButton.FgColor				"Orange"
+				ScrollBarButton.FgColor				"White"
 		ScrollBarButton.BgColor				"Blank"
-		ScrollBarButton.ArmedFgColor		"Orange"
+		ScrollBarButton.ArmedFgColor		"White"
 		ScrollBarButton.ArmedBgColor		"Blank"
-		ScrollBarButton.DepressedFgColor	"Orange"
+		ScrollBarButton.DepressedFgColor	"White"
 		ScrollBarButton.DepressedBgColor	"Blank"
 
 		ScrollBarSlider.FgColor				"Blank"		// nob color
 		ScrollBarSlider.BgColor				"Blank"		// slider background color
 
-		SectionedListPanel.HeaderTextColor	"Orange"
+		SectionedListPanel.HeaderTextColor	"White"
 		SectionedListPanel.HeaderBgColor	"Blank"
 		SectionedListPanel.DividerColor		"Black"
-		SectionedListPanel.TextColor		"Orange"
-		SectionedListPanel.BrightTextColor	"Orange"
+		SectionedListPanel.TextColor		"White"
+		SectionedListPanel.BrightTextColor	"White"
 		SectionedListPanel.BgColor			"TransparentLightBlack"
 		SectionedListPanel.SelectedTextColor			"Black"
 		SectionedListPanel.SelectedBgColor				"Red"
@@ -196,17 +196,17 @@ Scheme
 		Slider.DisabledTextColor1	"117 117 117 255"
 		Slider.DisabledTextColor2	"30 30 30 255"
 
-		TextEntry.TextColor			"Orange"
+		TextEntry.TextColor			"White"
 		TextEntry.BgColor			"TransparentBlack"
-		TextEntry.CursorColor		"Orange"
-		TextEntry.DisabledTextColor	"Orange"
+		TextEntry.CursorColor		"White"
+		TextEntry.DisabledTextColor	"White"
 		TextEntry.DisabledBgColor	"Blank"
 		TextEntry.SelectedTextColor	"Black"
 		TextEntry.SelectedBgColor	"Red"
 		TextEntry.OutOfFocusSelectedBgColor	"Red"
 		TextEntry.FocusEdgeColor	"TransparentBlack"
 
-		ToggleButton.SelectedTextColor	"Orange"
+		ToggleButton.SelectedTextColor	"White"
 
 		Tooltip.TextColor			"TransparentBlack"
 		Tooltip.BgColor				"Red"
@@ -463,7 +463,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"jbmod"
+				"name"		"Verdana Bold"
 				"tall"		"18"
 				"weight"	"500"
 			}
@@ -525,7 +525,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"HalfLife2"
+				"name"		"Sometype Mono"
 				"tall"		"32"
 				"weight"	"0"
 				"antialias" "1"
@@ -537,7 +537,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"HalfLife2"
+				"name"		"Sometype Mono"
 				"tall"		"32"
 				"weight"	"0"
 				"blur"		"4"
@@ -551,7 +551,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"HalfLife2" [!$OSX]
+				"name"		"Sometype Mono" [!$OSX]
 				"name"		"Helvetica Bold" [$OSX]
 				"tall"		"16"
 				"weight"	"1000"
@@ -564,7 +564,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"Verdana"
+				"name"		"Sometype Mono"
 				"tall"		"11"
 				"weight"	"700"
 				"antialias" "1"
@@ -757,7 +757,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"  "Trebuchet MS"
+				"name"  "K12HL2"
 				"tall"  "46"
 				"weight" "0"
 				"additive" "0"
@@ -826,7 +826,7 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"Verdana"
+				"name"		"Segoe"
 				"tall"		"12"
 				"weight"	"700"
 				"yres"	"480 599"
@@ -834,7 +834,7 @@ Scheme
 			}
 			"2"
 			{
-				"name"		"Verdana"
+				"name"		"Segoe"
 				"tall"		"13"
 				"weight"	"700"
 				"yres"	"600 767"
@@ -842,7 +842,7 @@ Scheme
 			}
 			"3"
 			{
-				"name"		"Verdana"
+				"name"		"Segoe"
 				"tall"		"14"
 				"weight"	"700"
 				"yres"	"768 1023"
@@ -850,7 +850,7 @@ Scheme
 			}
 			"4"
 			{
-				"name"		"Verdana"
+				"name"		"Segoe"
 				"tall"		"20"
 				"weight"	"700"
 				"yres"	"1024 1199"
@@ -858,7 +858,7 @@ Scheme
 			}
 			"5"
 			{
-				"name"		"Verdana"
+				"name"		"Segoe"
 				"tall"		"24"
 				"weight"	"700"
 				"yres"	"1200 10000"
@@ -1576,9 +1576,10 @@ Scheme
 	CustomFontFiles
 	{
 		"1"		"resource/HALFLIFE2.ttf"
-		"1"		"resource/HL2MP.ttf"
-		"2"		"resource/HL2crosshairs.ttf"
-		"3"		"resource/jbmod.ttf"
+		"2"		"resource/HL2MP.ttf"
+		"3"		"resource/HL2crosshairs.ttf"
+		"4"		"resource/K12HL2.ttf"
+		"5"		"resource/genos.ttf"
 	}
 
 }

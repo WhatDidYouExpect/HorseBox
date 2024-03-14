@@ -1471,7 +1471,7 @@ Color CBaseHudChat::GetClientColor( int clientIndex )
 		return g_ColorGrey;
 	}
 
-	return g_ColorYellow;
+	return g_ColorWhite;
 }
 
 //-----------------------------------------------------------------------------
