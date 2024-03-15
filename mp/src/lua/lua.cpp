@@ -1,7 +1,7 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
-#include "public/lua/lua.h"
+#include "../public/lua/lua.h"
 #include "tier1/interface.h"
 
 class CLua : public ILua
@@ -10,6 +10,9 @@ public:
 	virtual LuaScript LoadScript(const char* script);
 	virtual LuaValue CallFunction(LuaScript script, const char* fun, const char* types, ...);
 	virtual void ShutdownScript(LuaScript script);
+	virtual void AddFunction(LuaScript script, const char* name, LuaFunction fun);
+	virtual bool GetArgs(LuaScript script, const char* types, ...);
+	virtual void PushValue(LuaScript script, LuaValue val);
 };
 
 LuaScript CLua::LoadScript(const char* script)
@@ -89,6 +92,94 @@ void CLua::ShutdownScript(LuaScript script)
 {
 	lua_State* L = (lua_State*)script;
 	lua_close(L);
+}
+
+void CLua::AddFunction(LuaScript script, const char* name, LuaFunction fun)
+{
+	lua_State* L = (lua_State*)script;
+	lua_pushcclosure(L, (lua_CFunction)fun, 1);
+	lua_setglobal(L, name);
+}
+
+bool CLua::GetArgs(LuaScript script, const char* types, ...)
+{
+	lua_State* L = (lua_State*)script;
+	va_list args;
+	va_start(args, types);
+	int count = strlen(types);
+	for (int i = 0; i < count; ++i)
+	{
+		switch (types[i])
+		{
+		case 'i':
+			if (lua_isinteger(L, -1 - i))
+			{
+				*(va_arg(args, int*)) = lua_tointeger(L, -1 - i);
+			}
+			else
+			{
+				return false;
+			}
+			
+			break;
+		case 'b':
+			if (lua_isboolean(L, -1 - i))
+			{
+				*(va_arg(args, bool*)) = (bool)lua_toboolean(L, -1 - i);
+			}
+			else
+			{
+				return false;
+			}
+			break;
+		case 's':
+			if (lua_isstring(L, -1 - i))
+			{
+				*(va_arg(args, const char**)) = lua_tostring(L, -1 - i);
+			}
+			else
+			{
+				return false;
+			}
+			break;
+		case 'f':
+			if (lua_isnumber(L, -1 - i))
+			{
+				*(va_arg(args, float*)) = lua_tonumber(L, -1 - i);
+			}
+			else
+			{
+				return false;
+			}
+			break;
+		default:
+			return false;
+			break;
+		}
+	}
+	return true;
+}
+void CLua::PushValue(LuaScript script, LuaValue val)
+{
+	lua_State* L = (lua_State*)script;
+	switch (val.type)
+	{
+	case LUA_INT:
+		lua_pushinteger(L, val.val_int);
+		break;
+	case LUA_BOOL:
+		lua_pushboolean(L, val.val_bool);
+		break;
+	case LUA_STRING:
+		lua_pushstring(L, val.val_string);
+		break;
+	case LUA_FLOAT:
+		lua_pushnumber(L, val.val_float);
+		break;
+	default:
+		lua_pushnil(L);
+		break;
+	}
 }
 
 EXPOSE_SINGLE_INTERFACE(CLua, ILua, INTERFACELUA_VERSION);

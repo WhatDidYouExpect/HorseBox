@@ -184,6 +184,7 @@ ISceneFileCache *scenefilecache = NULL;
 IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;	// Xbox 360 only
 ILua* g_pLua = NULL;
+CUtlVector<LuaScript> luascripts;
 #if defined( REPLAY_ENABLED )
 IReplaySystem *g_pReplay = NULL;
 IServerReplayContext *g_pReplayServerContext = NULL;
@@ -860,6 +861,71 @@ float CServerGameDLL::GetTickInterval( void ) const
 	return tickinterval;
 }
 
+int Lua_FindEntityByClassname(LuaScript script)
+{
+	const char* name;
+	int firstent;
+	if (!g_pLua->GetArgs(script, "si", &name, &firstent))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = gEntList.FindEntityByClassname(gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(firstent)),name);
+	LuaValue ret;
+	if (ent)
+	{
+		ret.val_int = ent->entindex();
+		ret.type = LUA_INT;
+	}
+	else
+	{
+		ret.type = LUA_INVALID;
+	}
+	g_pLua->PushValue(script, ret);
+	return 1;
+}
+
+int Lua_SetVelocity(LuaScript script)
+{
+	int ent;
+	float x, y, z;
+	if (!g_pLua->GetArgs(script, "ifff", &ent, &x, &y, &z))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(ent));
+	if (baseent)
+	{
+		baseent->Teleport(NULL, NULL, new Vector(x, y, z));
+	}
+	return 0;
+}
+
+int Lua_GetConvar(LuaScript script)
+{
+	const char* convarname;
+	if (!g_pLua->GetArgs(script, "s", &convarname))
+	{
+		return 0;
+	}
+	ConVarRef conv(convarname);
+	LuaValue ret;
+	ret.type = LUA_STRING;
+	ret.val_string = conv.GetString();
+	g_pLua->PushValue(script, ret);
+	return 1;
+}
+
+int Lua_PrintToServer(LuaScript script)
+{
+	const char* toprint;
+	if (!g_pLua->GetArgs(script, "s", &toprint))
+	{
+		return 0;
+	}
+	Msg(toprint);
+	return 0;
+}
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -873,7 +939,12 @@ void LoadMod(const char* path)
 	if (g_pFullFileSystem->ReadFile(path, NULL, codebuffer))
 	{
 		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()));
-		LuaValue returned = g_pLua->CallFunction(script, "main", "");
+		g_pLua->AddFunction(script, "FindEntityByClassname", Lua_FindEntityByClassname);
+		g_pLua->AddFunction(script, "GetConvar", Lua_GetConvar);
+		g_pLua->AddFunction(script, "SetVelocity", Lua_SetVelocity);
+		g_pLua->AddFunction(script, "PrintToServer", Lua_PrintToServer);
+		
+		LuaValue returned = g_pLua->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
 		{
 		case LUA_INT:
@@ -892,7 +963,7 @@ void LoadMod(const char* path)
 			Msg("Lua %s failed to execute/return a value\n");
 			break;
 		}
-		g_pLua->ShutdownScript(script);
+		luascripts.AddToTail(script);
 	}
 }
 
@@ -944,6 +1015,13 @@ bool CServerGameDLL::GameInit( void )
 	{
 		gameeventmanager->FireEvent( event );
 	}
+
+	for (int i = 0; i < luascripts.Count(); ++i)
+	{
+		g_pLua->ShutdownScript(luascripts[i]);
+	}
+
+	luascripts.RemoveAll();
 
 	FileFindHandle_t findHandle;
 	const char* pszFileName = g_pFullFileSystem->FindFirst("mods/*", &findHandle);
@@ -1379,6 +1457,11 @@ void CServerGameDLL::GameFrame( bool simulating )
 	g_NetworkPropertyEventMgr.FireEvents();
 
 	gpGlobals->frametime = oldframetime;
+
+	for (int i = 0; i < luascripts.Count(); i++)
+	{
+		g_pLua->CallFunction(luascripts[i], "OnGameFrame", "");
+	}
 }
 
 //-----------------------------------------------------------------------------

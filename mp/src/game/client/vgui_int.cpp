@@ -244,6 +244,7 @@ void VGui_Shutdown()
 	messagechars->Destroy();
 	loadingdisc->Destroy();
 	internalCenterPrint->Destroy();
+	jb_mountingmenu->DeletePanel();
 
 	if ( g_pClientMode )
 	{
