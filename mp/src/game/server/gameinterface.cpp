@@ -860,6 +860,77 @@ float CServerGameDLL::GetTickInterval( void ) const
 	return tickinterval;
 }
 
+void LoadMod(const char* path)
+{
+	int len = strlen(path);
+	if (len < 4 || !(path[len - 4] == '.' && path[len - 3] == 'l' && path[len - 2] == 'u' && path[len - 1] == 'a'))
+		return;
+
+	CUtlBuffer codebuffer;
+
+	codebuffer.Clear();
+
+	if (g_pFullFileSystem->ReadFile(path, NULL, codebuffer))
+	{
+		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()));
+		LuaValue returned = g_pLua->CallFunction(script, "main", "");
+		switch (returned.type)
+		{
+		case LUA_INT:
+			Msg("Lua %s returned int : %i\n", path, returned.val_int);
+			break;
+		case LUA_BOOL:
+			Msg("Lua %s returned bool : %s\n", path, returned.val_bool ? "true" : "false");
+			break;
+		case LUA_FLOAT:
+			Msg("Lua %s returned float : %f\n", path, returned.val_float);
+			break;
+		case LUA_STRING:
+			Msg("Lua %s returned string : %s\n", path, returned.val_string);
+			break;
+		default:
+			Msg("Lua %s failed to execute/return a value\n");
+			break;
+		}
+		g_pLua->ShutdownScript(script);
+	}
+}
+
+void LoadFilesInDirectory(const char* modname, const char* folder, const char* filename)
+{
+	FileFindHandle_t findHandle;
+	char searchPath[MAX_PATH];
+	strcpy(searchPath, "mods/");
+	strncat(searchPath, folder, MAX_PATH);
+	strncat(searchPath, "/*", MAX_PATH);
+	const char* pszFileName = g_pFullFileSystem->FindFirst(searchPath, &findHandle);
+	char pszFileNameNoExt[MAX_PATH];
+	while (pszFileName)
+	{
+		if (pszFileName[0] == '.')
+		{
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		if (g_pFullFileSystem->FindIsDirectory(findHandle))
+		{
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		V_StripExtension(pszFileName, pszFileNameNoExt, MAX_PATH);
+		if (V_strcmp(filename, pszFileNameNoExt) == 0)
+		{
+			char pFilePath[MAX_PATH];
+			strcpy(pFilePath, "mods/");
+			strncat(pFilePath, folder, MAX_PATH);
+			V_AppendSlash(pFilePath, MAX_PATH);
+			strncat(pFilePath, pszFileName, MAX_PATH);
+			LoadMod(pFilePath);
+		}
+		pszFileName = g_pFullFileSystem->FindNext(findHandle);
+	}
+}
+
 // This is called when a new game is started. (restart, map)
 bool CServerGameDLL::GameInit( void )
 {
@@ -872,6 +943,24 @@ bool CServerGameDLL::GameInit( void )
 	if ( event )
 	{
 		gameeventmanager->FireEvent( event );
+	}
+
+	FileFindHandle_t findHandle;
+	const char* pszFileName = g_pFullFileSystem->FindFirst("mods/*", &findHandle);
+	while (pszFileName)
+	{
+		if (pszFileName[0] == '.')
+		{
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		if (g_pFullFileSystem->FindIsDirectory(findHandle))
+		{
+			LoadFilesInDirectory(pszFileName, pszFileName, "main");
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		pszFileName = g_pFullFileSystem->FindNext(findHandle);
 	}
 
 	return true;
@@ -3511,3 +3600,9 @@ CSteamID GetSteamIDForPlayerIndex( int iPlayerIndex )
 }
 
 #endif
+
+
+CON_COMMAND(lua_execute, "Execute a lua function")
+{
+	
+}
