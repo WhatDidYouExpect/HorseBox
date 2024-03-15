@@ -785,7 +785,7 @@
 ** without modifying the main part of the file.
 */
 
-
+//#define LUA_USE_LONGJMP
 
 
 

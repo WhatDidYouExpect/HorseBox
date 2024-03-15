@@ -884,6 +884,8 @@ int Lua_FindEntityByClassname(LuaScript script)
 	return 1;
 }
 
+
+
 int Lua_SetVelocity(LuaScript script)
 {
 	int ent;
@@ -943,6 +945,7 @@ void LoadMod(const char* path)
 		g_pLua->AddFunction(script, "GetConvar", Lua_GetConvar);
 		g_pLua->AddFunction(script, "SetVelocity", Lua_SetVelocity);
 		g_pLua->AddFunction(script, "PrintToServer", Lua_PrintToServer);
+
 		
 		LuaValue returned = g_pLua->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
@@ -966,6 +969,7 @@ void LoadMod(const char* path)
 		luascripts.AddToTail(script);
 	}
 }
+
 
 void LoadFilesInDirectory(const char* modname, const char* folder, const char* filename)
 {
@@ -1034,7 +1038,7 @@ bool CServerGameDLL::GameInit( void )
 		}
 		if (g_pFullFileSystem->FindIsDirectory(findHandle))
 		{
-			LoadFilesInDirectory(pszFileName, pszFileName, "main");
+			LoadFilesInDirectory(pszFileName, pszFileName, "sv_main");
 			pszFileName = g_pFullFileSystem->FindNext(findHandle);
 			continue;
 		}
@@ -2985,6 +2989,11 @@ void CServerGameClients::ClientPutInServer( edict_t *pEntity, const char *player
 void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
 {
 	CBasePlayer *pPlayer = ToBasePlayer( GetContainingEntity( pEntity ) );
+	for (int i = 0; i < luascripts.Count(); i++)
+	{
+		//Msg("%i: %s\n", pPlayer->entindex(), args.GetCommandString());
+		g_pLua->CallFunction(luascripts[i], "OnClientExecCmd", "is", pPlayer->entindex(), args.GetCommandString());
+	}
 	::ClientCommand( pPlayer, args );
 }
 

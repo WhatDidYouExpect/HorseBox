@@ -37,8 +37,10 @@ LuaValue CLua::CallFunction(LuaScript script, const char* fun, const char* types
 	{
 		return ret;
 	}
+	
 	va_list args;
 	va_start(args, types);
+	
 	int count = strlen(types);
 	for (int i = 0; i < count; ++i)
 	{
@@ -61,6 +63,7 @@ LuaValue CLua::CallFunction(LuaScript script, const char* fun, const char* types
 			break;
 		}
 	}
+	va_end(args);
 	if (lua_pcall(L, count, 1, 0))
 	{
 		return ret;
@@ -101,6 +104,7 @@ void CLua::AddFunction(LuaScript script, const char* name, LuaFunction fun)
 	lua_setglobal(L, name);
 }
 
+
 bool CLua::GetArgs(LuaScript script, const char* types, ...)
 {
 	lua_State* L = (lua_State*)script;
@@ -112,47 +116,56 @@ bool CLua::GetArgs(LuaScript script, const char* types, ...)
 		switch (types[i])
 		{
 		case 'i':
-			if (lua_isinteger(L, -1 - i))
+			if (lua_isinteger(L, i + 1))
 			{
-				*(va_arg(args, int*)) = lua_tointeger(L, -1 - i);
+				*(va_arg(args, int*)) = lua_tointeger(L,  i + 1);
+			}
+			else if (lua_isnumber(L, i + 1))
+			{
+				*(va_arg(args, int*)) = lua_tointeger(L, i + 1);
 			}
 			else
 			{
+				va_end(args);
 				return false;
 			}
 			
 			break;
 		case 'b':
-			if (lua_isboolean(L, -1 - i))
+			if (lua_isboolean(L, i + 1))
 			{
-				*(va_arg(args, bool*)) = (bool)lua_toboolean(L, -1 - i);
+				*(va_arg(args, bool*)) = (bool)lua_toboolean(L,  i + 1);
 			}
 			else
 			{
+				va_end(args);
 				return false;
 			}
 			break;
 		case 's':
-			if (lua_isstring(L, -1 - i))
+			if (lua_isstring(L, i + 1))
 			{
-				*(va_arg(args, const char**)) = lua_tostring(L, -1 - i);
+				*(va_arg(args, const char**)) = lua_tostring(L, i + 1);
 			}
 			else
 			{
+				va_end(args);
 				return false;
 			}
 			break;
 		case 'f':
-			if (lua_isnumber(L, -1 - i))
+			if (lua_isnumber(L, i + 1))
 			{
-				*(va_arg(args, float*)) = lua_tonumber(L, -1 - i);
+				*(va_arg(args, float*)) = lua_tonumber(L,  i+1);
 			}
 			else
 			{
+				va_end(args);
 				return false;
 			}
 			break;
 		default:
+			va_end(args);
 			return false;
 			break;
 		}

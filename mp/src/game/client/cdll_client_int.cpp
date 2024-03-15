@@ -127,6 +127,7 @@
 #include "sourcevr/isourcevirtualreality.h"
 #include "client_virtualreality.h"
 #include "mumble.h"
+#include "lua/lua.h"
 
 // NVNT includes
 #include "hud_macros.h"
@@ -208,6 +209,8 @@ IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;
 IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
+ILua* g_pLua = NULL;
+CUtlVector<LuaScript> luascripts;
 #if defined( REPLAY_ENABLED )
 IReplayManager *g_pReplayManager = NULL;
 IReplayMovieManager *g_pReplayMovieManager = NULL;
@@ -1109,6 +1112,24 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	HookHapticMessages(); // Always hook the messages
 #endif
 
+	CSysModule* pLuaDLL = g_pFullFileSystem->LoadModule("lua", "GAMEBIN", false);
+	if (pLuaDLL != nullptr)
+	{
+		CreateInterfaceFn luaFactory = Sys_GetFactory(pLuaDLL);
+		if (luaFactory != nullptr)
+		{
+			g_pLua = (ILua*)luaFactory(INTERFACELUA_VERSION, NULL);
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -1586,6 +1607,121 @@ void CHLClient::View_Fade( ScreenFade_t *pSF )
 		vieweffects->Fade( *pSF );
 }
 
+int Lua_GetConvar(LuaScript script)
+{
+	const char* convarname;
+	if (!g_pLua->GetArgs(script, "s", &convarname))
+	{
+		return 0;
+	}
+	ConVarRef conv(convarname);
+	LuaValue ret;
+	ret.type = LUA_STRING;
+	ret.val_string = conv.GetString();
+	g_pLua->PushValue(script, ret);
+	return 1;
+}
+
+int Lua_PrintToClient(LuaScript script)
+{
+	const char* toprint;
+	if (!g_pLua->GetArgs(script, "s", &toprint))
+	{
+		return 0;
+	}
+	Msg(toprint);
+	return 0;
+}
+
+int Lua_ExecuteConsoleCommand(LuaScript script)
+{
+	const char* cmd;
+	if (!g_pLua->GetArgs(script, "s", &cmd))
+	{
+		return 0;
+	}
+	engine->ClientCmd(cmd);
+	return 0;
+}
+
+void LoadMod(const char* path)
+{
+	int len = strlen(path);
+	if (len < 4 || !(path[len - 4] == '.' && path[len - 3] == 'l' && path[len - 2] == 'u' && path[len - 1] == 'a'))
+		return;
+
+	CUtlBuffer codebuffer;
+
+	codebuffer.Clear();
+
+	if (g_pFullFileSystem->ReadFile(path, NULL, codebuffer))
+	{
+		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()));
+		g_pLua->AddFunction(script, "ExecuteConsoleCommand", Lua_ExecuteConsoleCommand);
+		g_pLua->AddFunction(script, "GetConvar", Lua_GetConvar);
+		g_pLua->AddFunction(script, "PrintToClient", Lua_PrintToClient);
+
+
+		LuaValue returned = g_pLua->CallFunction(script, "OnModStart", "");
+		switch (returned.type)
+		{
+		case LUA_INT:
+			Msg("Lua %s returned int : %i\n", path, returned.val_int);
+			break;
+		case LUA_BOOL:
+			Msg("Lua %s returned bool : %s\n", path, returned.val_bool ? "true" : "false");
+			break;
+		case LUA_FLOAT:
+			Msg("Lua %s returned float : %f\n", path, returned.val_float);
+			break;
+		case LUA_STRING:
+			Msg("Lua %s returned string : %s\n", path, returned.val_string);
+			break;
+		default:
+			Msg("Lua %s failed to execute/return a value\n");
+			break;
+		}
+		luascripts.AddToTail(script);
+	}
+}
+
+void LoadFilesInDirectory(const char* modname, const char* folder, const char* filename)
+{
+	FileFindHandle_t findHandle;
+	char searchPath[MAX_PATH];
+	strcpy(searchPath, "mods/");
+	strncat(searchPath, folder, MAX_PATH);
+	strncat(searchPath, "/*", MAX_PATH);
+	const char* pszFileName = g_pFullFileSystem->FindFirst(searchPath, &findHandle);
+	char pszFileNameNoExt[MAX_PATH];
+	while (pszFileName)
+	{
+		if (pszFileName[0] == '.')
+		{
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		if (g_pFullFileSystem->FindIsDirectory(findHandle))
+		{
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		V_StripExtension(pszFileName, pszFileNameNoExt, MAX_PATH);
+		if (V_strcmp(filename, pszFileNameNoExt) == 0)
+		{
+			char pFilePath[MAX_PATH];
+			strcpy(pFilePath, "mods/");
+			strncat(pFilePath, folder, MAX_PATH);
+			V_AppendSlash(pFilePath, MAX_PATH);
+			strncat(pFilePath, pszFileName, MAX_PATH);
+			LoadMod(pFilePath);
+		}
+		pszFileName = g_pFullFileSystem->FindNext(findHandle);
+	}
+}
+
+
+
 //-----------------------------------------------------------------------------
 // Purpose: Per level init
 //-----------------------------------------------------------------------------
@@ -1658,6 +1794,32 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		CReplayRagdollRecorder::Instance().Init();
 	}
 #endif
+
+	for (int i = 0; i < luascripts.Count(); ++i)
+	{
+		g_pLua->ShutdownScript(luascripts[i]);
+	}
+	
+	luascripts.RemoveAll();
+
+	FileFindHandle_t findHandle;
+	const char* pszFileName = g_pFullFileSystem->FindFirst("mods/*", &findHandle);
+	while (pszFileName)
+	{
+		if (pszFileName[0] == '.')
+		{
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		if (g_pFullFileSystem->FindIsDirectory(findHandle))
+		{
+			LoadFilesInDirectory(pszFileName, pszFileName, "cl_main");
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		pszFileName = g_pFullFileSystem->FindNext(findHandle);
+	}
+	
 }
 
 

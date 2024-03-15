@@ -10,7 +10,7 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories  	"$BASE;..\;..\public\lua;..\public"
-		$DisableSpecificWarnings			"4244;4310;4701;4702;4530;$BASE"
+		$DisableSpecificWarnings			"4244;4310;4701;4702;4530;4611;4505;4102;$BASE"
 	}
 	
 	
