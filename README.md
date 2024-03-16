@@ -22,3 +22,10 @@ To be able to play JBModCE as of now you need:
 
 # Contributing
 We appreciate any form of help so ideally if you want to help this project out the best way would be to make a pull request.
+This is based off [Source SDK 2013 CE](https://github.com/Nbc66/source-sdk-2013-ce)
+Meaning you need:
+* MSVC v143 - VS 2022 C++ x64/x86 build tools
+* C++ MFC Library for latest v143 build tools (x86 and x64)
+* Windows 11 SDK (10.0.22000.0)
+* Microsoft Visual Studio 2022
+To be able to compile the solution
