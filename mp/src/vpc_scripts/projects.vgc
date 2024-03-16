@@ -141,7 +141,7 @@ $Project "launcher"
 	"launcher\launcher.vpc" [$WIN32]
 }
 
-$Project "lua"
+$Project "squirrel"
 {
-	"lua\lua.vpc" [$WIN32]
+	"squirrel\squirrel.vpc" [$WIN32]
 }

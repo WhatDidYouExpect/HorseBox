@@ -127,7 +127,7 @@
 #include "sourcevr/isourcevirtualreality.h"
 #include "client_virtualreality.h"
 #include "mumble.h"
-#include "lua/lua.h"
+//#include "lua/lua.h"
 
 // NVNT includes
 #include "hud_macros.h"
@@ -209,8 +209,8 @@ IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;
 IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
-ILua* g_pLua = NULL;
-CUtlVector<LuaScript> luascripts;
+//ILua* g_pLua = NULL;
+//CUtlVector<LuaScript> luascripts;
 #if defined( REPLAY_ENABLED )
 IReplayManager *g_pReplayManager = NULL;
 IReplayMovieManager *g_pReplayMovieManager = NULL;
@@ -1606,7 +1606,7 @@ void CHLClient::View_Fade( ScreenFade_t *pSF )
 	if ( pSF != NULL )
 		vieweffects->Fade( *pSF );
 }
-
+/*
 int Lua_GetConvar(LuaScript script)
 {
 	const char* convarname;
@@ -1730,7 +1730,7 @@ void LoadFilesInDirectory(const char* modname, const char* folder, const char* f
 		pszFileName = g_pFullFileSystem->FindNext(findHandle);
 	}
 }
-
+*/
 
 
 //-----------------------------------------------------------------------------

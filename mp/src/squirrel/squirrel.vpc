@@ -9,8 +9,8 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories  	"$BASE;..\;..\public\squirrel;..\public"
-		$DisableSpecificWarnings			"4244;4310;4701;4702;4530;4611;4505;4102;$BASE"
+		$AdditionalIncludeDirectories  	"$BASE;..\;..\public"
+		$DisableSpecificWarnings			"4244;4127;4706;4100;4310;4701;4702;4530;4611;4505;4102;$BASE"
 	}
 	
 	

@@ -23,7 +23,7 @@ $Group "game"
 	"tier1"
 	"vgui_controls"
 	"launcher"
-	"lua"
+	"squirrel"
 }
 
 $Group "shaders"
@@ -59,7 +59,7 @@ $Group "everything"
 	"vvis_launcher"
 	"togl"
 	"launcher"
-	"lua"
+	"squirrel"
 }
 
 $Group "dedicated"

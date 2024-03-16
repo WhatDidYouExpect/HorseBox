@@ -89,7 +89,7 @@
 #include "tier3/tier3.h"
 #include "serverbenchmark_base.h"
 #include "querycache.h"
-#include "lua/lua.h"
+#include "squirrel/squirrel.h"
 
 #ifdef TF_DLL
 #include "gc_clientsystem.h"
@@ -183,8 +183,8 @@ IServerEngineTools *serverenginetools = NULL;
 ISceneFileCache *scenefilecache = NULL;
 IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;	// Xbox 360 only
-ILua* g_pLua = NULL;
-CUtlVector<LuaScript> luascripts;
+ISquirrel* g_pSquirrel = NULL;
+CUtlVector<SquirrelScript> squirrelscripts;
 #if defined( REPLAY_ENABLED )
 IReplaySystem *g_pReplay = NULL;
 IServerReplayContext *g_pReplayServerContext = NULL;
@@ -745,13 +745,13 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	gamestatsuploader->InitConnection();
 #endif
 
-	CSysModule* pLuaDLL = g_pFullFileSystem->LoadModule("lua", "GAMEBIN", false);
-	if (pLuaDLL != nullptr)
+	CSysModule* pSquirrelDLL = g_pFullFileSystem->LoadModule("squirrel", "GAMEBIN", false);
+	if (pSquirrelDLL != nullptr)
 	{
-		CreateInterfaceFn gamepaduiFactory = Sys_GetFactory(pLuaDLL);
-		if (gamepaduiFactory != nullptr)
+		CreateInterfaceFn squirrelFactory = Sys_GetFactory(pSquirrelDLL);
+		if (squirrelFactory != nullptr)
 		{
-			g_pLua = (ILua*)gamepaduiFactory(INTERFACELUA_VERSION, NULL);
+			g_pSquirrel = (ISquirrel*)squirrelFactory(INTERFACESQUIRREL_VERSION, NULL);
 		}
 	}
 
@@ -861,36 +861,36 @@ float CServerGameDLL::GetTickInterval( void ) const
 	return tickinterval;
 }
 
-int Lua_FindEntityByClassname(LuaScript script)
+int Squirrel_FindEntityByClassname(SquirrelScript script)
 {
 	const char* name;
 	int firstent;
-	if (!g_pLua->GetArgs(script, "si", &name, &firstent))
+	if (!g_pSquirrel->GetArgs(script, "si", &name, &firstent))
 	{
 		return 0;
 	}
 	CBaseEntity* ent = gEntList.FindEntityByClassname(gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(firstent)),name);
-	LuaValue ret;
+	SquirrelValue ret;
 	if (ent)
 	{
 		ret.val_int = ent->entindex();
-		ret.type = LUA_INT;
+		ret.type = SQUIRREL_INT;
 	}
 	else
 	{
-		ret.type = LUA_INVALID;
+		ret.type = SQUIRREL_INVALID;
 	}
-	g_pLua->PushValue(script, ret);
+	g_pSquirrel->PushValue(script, ret);
 	return 1;
 }
 
 
 
-int Lua_SetVelocity(LuaScript script)
+int Squirrel_SetVelocity(SquirrelScript script)
 {
 	int ent;
 	float x, y, z;
-	if (!g_pLua->GetArgs(script, "ifff", &ent, &x, &y, &z))
+	if (!g_pSquirrel->GetArgs(script, "ifff", &ent, &x, &y, &z))
 	{
 		return 0;
 	}
@@ -902,25 +902,25 @@ int Lua_SetVelocity(LuaScript script)
 	return 0;
 }
 
-int Lua_GetConvar(LuaScript script)
+int Squirrel_GetConvar(SquirrelScript script)
 {
 	const char* convarname;
-	if (!g_pLua->GetArgs(script, "s", &convarname))
+	if (!g_pSquirrel->GetArgs(script, "s", &convarname))
 	{
 		return 0;
 	}
 	ConVarRef conv(convarname);
-	LuaValue ret;
-	ret.type = LUA_STRING;
+	SquirrelValue ret;
+	ret.type = SQUIRREL_STRING;
 	ret.val_string = conv.GetString();
-	g_pLua->PushValue(script, ret);
+	g_pSquirrel->PushValue(script, ret);
 	return 1;
 }
 
-int Lua_PrintToServer(LuaScript script)
+int Squirrel_PrintToServer(SquirrelScript script)
 {
 	const char* toprint;
-	if (!g_pLua->GetArgs(script, "s", &toprint))
+	if (!g_pSquirrel->GetArgs(script, "s", &toprint))
 	{
 		return 0;
 	}
@@ -928,7 +928,7 @@ int Lua_PrintToServer(LuaScript script)
 	return 0;
 }
 
-void* LuaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
+void* SquirrelAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 {
 	(void)ud; (void)osize; //unused
 	if (nsize == 0)
@@ -942,7 +942,7 @@ void* LuaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
-	if (len < 4 || !(path[len - 4] == '.' && path[len - 3] == 'l' && path[len - 2] == 'u' && path[len - 1] == 'a'))
+	if (len < 4 || !(path[len - 4] == '.' && path[len - 3] == 'n' && path[len - 2] == 'u' && path[len - 1] == 't'))
 		return;
 
 	CUtlBuffer codebuffer;
@@ -951,33 +951,33 @@ void LoadMod(const char* path)
 
 	if (g_pFullFileSystem->ReadFile(path, NULL, codebuffer))
 	{
-		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()), LuaAlloc);
-		g_pLua->AddFunction(script, "FindEntityByClassname", Lua_FindEntityByClassname);
-		g_pLua->AddFunction(script, "GetConvar", Lua_GetConvar);
-		g_pLua->AddFunction(script, "SetVelocity", Lua_SetVelocity);
-		g_pLua->AddFunction(script, "PrintToServer", Lua_PrintToServer);
+		SquirrelScript script = g_pSquirrel->LoadScript((const char*)(codebuffer.Base()), SquirrelAlloc);
+		g_pSquirrel->AddFunction(script, "FindEntityByClassname", Squirrel_FindEntityByClassname);
+		g_pSquirrel->AddFunction(script, "GetConvar", Squirrel_GetConvar);
+		g_pSquirrel->AddFunction(script, "SetVelocity", Squirrel_SetVelocity);
+		g_pSquirrel->AddFunction(script, "PrintToServer", Squirrel_PrintToServer);
 
 		
-		LuaValue returned = g_pLua->CallFunction(script, "OnModStart", "");
+		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
 		{
-		case LUA_INT:
+		case SQUIRREL_INT:
 			Msg("Lua %s returned int : %i\n", path, returned.val_int);
 			break;
-		case LUA_BOOL:
+		case SQUIRREL_BOOL:
 			Msg("Lua %s returned bool : %s\n", path, returned.val_bool ? "true" : "false");
 			break;
-		case LUA_FLOAT:
+		case SQUIRREL_FLOAT:
 			Msg("Lua %s returned float : %f\n", path, returned.val_float);
 			break;
-		case LUA_STRING:
+		case SQUIRREL_STRING:
 			Msg("Lua %s returned string : %s\n", path, returned.val_string);
 			break;
 		default:
 			Msg("Lua %s failed to execute/return a value\n",path);
 			break;
 		}
-		luascripts.AddToTail(script);
+		squirrelscripts.AddToTail(script);
 	}
 }
 
@@ -1031,12 +1031,12 @@ bool CServerGameDLL::GameInit( void )
 		gameeventmanager->FireEvent( event );
 	}
 
-	for (int i = 0; i < luascripts.Count(); ++i)
+	for (int i = 0; i < squirrelscripts.Count(); ++i)
 	{
-		g_pLua->ShutdownScript(luascripts[i]);
+		g_pSquirrel->ShutdownScript(squirrelscripts[i]);
 	}
 
-	luascripts.RemoveAll();
+	squirrelscripts.RemoveAll();
 
 	FileFindHandle_t findHandle;
 	const char* pszFileName = g_pFullFileSystem->FindFirst("mods/*", &findHandle);
@@ -1473,9 +1473,9 @@ void CServerGameDLL::GameFrame( bool simulating )
 
 	gpGlobals->frametime = oldframetime;
 
-	for (int i = 0; i < luascripts.Count(); i++)
+	for (int i = 0; i < squirrelscripts.Count(); i++)
 	{
-		g_pLua->CallFunction(luascripts[i], "OnGameFrame", "");
+		g_pSquirrel->CallFunction(squirrelscripts[i], "OnGameFrame", "");
 	}
 }
 
@@ -3003,9 +3003,9 @@ void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
 
 	
 	::ClientCommand( pPlayer, args );
-	for (int i = 0; i < luascripts.Count(); i++)
+	for (int i = 0; i < squirrelscripts.Count(); i++)
 	{
-		g_pLua->CallFunction(luascripts[i], "OnClientExecCmd", "");
+		g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientExecCmd", "is", pPlayer->entindex(), args.GetCommandString());
 	}
 }
 
