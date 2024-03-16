@@ -27,11 +27,12 @@ struct LuaValue  // I FUCKING LOVE TYPED UNIONS GRAAAAAAAAAAAAAAAAAAAH
 };
 
 typedef int (*LuaFunction)(LuaScript);
+typedef void* (*LuaAllocator) (void* ud, void* ptr, size_t osize, size_t nsize);
 
 class ILua
 {
 public:
-	virtual LuaScript LoadScript(const char* script) = 0;
+	virtual LuaScript LoadScript(const char* script, LuaAllocator allocator) = 0;
 	virtual LuaValue CallFunction(LuaScript script, const char* fun, const char* types, ...) = 0;
 	virtual void ShutdownScript(LuaScript script) = 0;
 	virtual void AddFunction(LuaScript script, const char* name, LuaFunction fun) = 0;

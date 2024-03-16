@@ -95,3 +95,5 @@ mp/game/JBModCE/materials/vgui/logos/spray.vtf
 mp/game/JBModCE/materials/vgui/logos/spray.vmt
 *.7z
 /mp/game/JBModCE/downloadlists
+*.lib
+*.pdb

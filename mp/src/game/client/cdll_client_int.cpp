@@ -1111,7 +1111,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 #ifndef _X360
 	HookHapticMessages(); // Always hook the messages
 #endif
-
+	/*
 	CSysModule* pLuaDLL = g_pFullFileSystem->LoadModule("lua", "GAMEBIN", false);
 	if (pLuaDLL != nullptr)
 	{
@@ -1129,7 +1129,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	{
 		return false;
 	}
-
+	*/
 	return true;
 }
 
@@ -1644,6 +1644,17 @@ int Lua_ExecuteConsoleCommand(LuaScript script)
 	return 0;
 }
 
+void* LuaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
+{
+	(void)ud; (void)osize; //unused
+	if (nsize == 0)
+	{
+		g_pMemAlloc->Free(ptr);
+		return 0;
+	}
+	return g_pMemAlloc->Realloc(ptr, nsize);
+}
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -1656,7 +1667,7 @@ void LoadMod(const char* path)
 
 	if (g_pFullFileSystem->ReadFile(path, NULL, codebuffer))
 	{
-		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()));
+		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()), LuaAlloc);
 		g_pLua->AddFunction(script, "ExecuteConsoleCommand", Lua_ExecuteConsoleCommand);
 		g_pLua->AddFunction(script, "GetConvar", Lua_GetConvar);
 		g_pLua->AddFunction(script, "PrintToClient", Lua_PrintToClient);
@@ -1794,7 +1805,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		CReplayRagdollRecorder::Instance().Init();
 	}
 #endif
-
+	/*
 	for (int i = 0; i < luascripts.Count(); ++i)
 	{
 		g_pLua->ShutdownScript(luascripts[i]);
@@ -1819,7 +1830,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		}
 		pszFileName = g_pFullFileSystem->FindNext(findHandle);
 	}
-	
+	*/
 }
 
 

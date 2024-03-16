@@ -928,6 +928,17 @@ int Lua_PrintToServer(LuaScript script)
 	return 0;
 }
 
+void* LuaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
+{
+	(void)ud; (void)osize; //unused
+	if (nsize == 0)
+	{
+		g_pMemAlloc->Free(ptr);
+		return 0;
+	}
+	return g_pMemAlloc->Realloc(ptr,nsize);
+}
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -940,7 +951,7 @@ void LoadMod(const char* path)
 
 	if (g_pFullFileSystem->ReadFile(path, NULL, codebuffer))
 	{
-		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()));
+		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()), LuaAlloc);
 		g_pLua->AddFunction(script, "FindEntityByClassname", Lua_FindEntityByClassname);
 		g_pLua->AddFunction(script, "GetConvar", Lua_GetConvar);
 		g_pLua->AddFunction(script, "SetVelocity", Lua_SetVelocity);
@@ -963,7 +974,7 @@ void LoadMod(const char* path)
 			Msg("Lua %s returned string : %s\n", path, returned.val_string);
 			break;
 		default:
-			Msg("Lua %s failed to execute/return a value\n");
+			Msg("Lua %s failed to execute/return a value\n",path);
 			break;
 		}
 		luascripts.AddToTail(script);
@@ -2989,12 +3000,13 @@ void CServerGameClients::ClientPutInServer( edict_t *pEntity, const char *player
 void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
 {
 	CBasePlayer *pPlayer = ToBasePlayer( GetContainingEntity( pEntity ) );
+
+	
+	::ClientCommand( pPlayer, args );
 	for (int i = 0; i < luascripts.Count(); i++)
 	{
-		//Msg("%i: %s\n", pPlayer->entindex(), args.GetCommandString());
-		g_pLua->CallFunction(luascripts[i], "OnClientExecCmd", "is", pPlayer->entindex(), args.GetCommandString());
+		g_pLua->CallFunction(luascripts[i], "OnClientExecCmd", "");
 	}
-	::ClientCommand( pPlayer, args );
 }
 
 //-----------------------------------------------------------------------------
