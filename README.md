@@ -16,11 +16,6 @@ JBMod CE is a Community Edition of JBMod that has more advanced features such as
 # Info
 There is a Wiki for JBMod CE [here](https://jbased-group.github.io/wiki)
 
-You can find Source 2013 CE's roadmap by going to our [Trello board](https://trello.com/b/MOxQ2iai/source-sdk-2013-community-edition).
-
-And you can also give us suggestions for fixes and features that you'd like to see in our Discord channel (`#source-SDK-2013-ce`) found in the 
-Source Modding Community server, which you can join [here](https://discord.gg/BD6WpY5).
-
 # Requirements 
 To be able to play JBModCE as of now you need:
 * Source SDK Base 2013 Multiplayer
