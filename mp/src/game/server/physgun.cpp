@@ -25,7 +25,7 @@
 #include "tier0/memdbgon.h"
 
 ConVar phys_gunmass("phys_gunmass", "200");
-ConVar phys_gunvel("phys_gunvel", "999");
+ConVar phys_gunvel("phys_gunvel", "3000");
 ConVar phys_gunforce("phys_gunforce", "5e5" );
 ConVar phys_guntorque("phys_guntorque", "100" );
 ConVar phys_gunglueradius("phys_gunglueradius", "128" );
@@ -46,8 +46,9 @@ public:
 	~CGravityPellet();
 	void Precache()
 	{
-		SetModelName( MAKE_STRING( "models/props_junk/watermelon01.mdl" ) );
-		//SetModelName(MAKE_STRING("models/weapons/w_bugbait.mdl"));
+		//to be fair the melon one was for the funnies
+		//SetModelName( MAKE_STRING( "models/props_junk/watermelon01.mdl" ) );
+		SetModelName(MAKE_STRING("models/weapons/w_bugbait.mdl"));
 		PrecacheModel( STRING( GetModelName() ) );
 		BaseClass::Precache();
 	}
@@ -1080,7 +1081,7 @@ void CWeaponGravityGun::DeleteActivePellets()
 		g_pEffects->Dust( pPellet->GetAbsOrigin(), forward, 32, 30 );
 
 		// UNDONE: Probably should just do this client side
-		CBeam *pBeam = CBeam::BeamCreate( PHYSGUN_BEAM_SPRITE, 1.5 );
+		CBeam *pBeam = CBeam::BeamCreate( PHYSGUN_BEAM_SPRITE, 0.25 );
 		pBeam->PointEntInit( pPellet->GetAbsOrigin(), pEnt );
 		pBeam->SetEndAttachment( 1 );
 		pBeam->SetBrightness( 255 );
@@ -1092,7 +1093,6 @@ void CWeaponGravityGun::DeleteActivePellets()
 	}
 	m_pelletCount = 0;
 }
-
 void CWeaponGravityGun::CreatePelletAttraction( float radius, CBaseEntity *pObject )
 {
 	int nearPellet = -1;
@@ -1347,24 +1347,25 @@ void CWeaponGravityGun::WeaponIdle( void )
 	if ( HasWeaponIdleTimeElapsed() )
 	{
 		SendWeaponAnim( ACT_VM_IDLE );
-		if ( m_active )
+		
+	}
+	if (m_active)
+	{
+		CBaseEntity* pObject = m_hObject;
+		// pellet is touching object, so glue it
+		if (pObject && m_glueTouching)
 		{
-			CBaseEntity *pObject = m_hObject;
-			// pellet is touching object, so glue it
-			if ( pObject && m_glueTouching )
+			CGravityPellet* pPellet = m_activePellets[m_pelletAttract].pellet;
+			if (pPellet->MakeConstraint(pObject))
 			{
-				CGravityPellet *pPellet = m_activePellets[m_pelletAttract].pellet;
-				if ( pPellet->MakeConstraint( pObject ) )
-				{
-					WeaponSound( SPECIAL1 );
-					m_flNextPrimaryAttack = gpGlobals->curtime + 0.75;
-					m_activePellets[m_pelletHeld].pellet->MakeInert();
-				}
+				WeaponSound(SPECIAL1);
+				m_flNextPrimaryAttack = gpGlobals->curtime + 0.75;
+				m_activePellets[m_pelletHeld].pellet->MakeInert();
 			}
-
-			EffectDestroy();
-			SoundDestroy();
 		}
+
+		EffectDestroy();  
+		SoundDestroy();
 	}
 }
 

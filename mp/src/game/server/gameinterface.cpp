@@ -881,7 +881,7 @@ int Squirrel_FindEntityByClassname(SquirrelScript script)
 		ret.type = SQUIRREL_INVALID;
 	}
 	g_pSquirrel->PushValue(script, ret);
-	return 1;
+	return 0;
 }
 
 
@@ -914,7 +914,7 @@ int Squirrel_GetConvar(SquirrelScript script)
 	ret.type = SQUIRREL_STRING;
 	ret.val_string = conv.GetString();
 	g_pSquirrel->PushValue(script, ret);
-	return 1;
+	return 0;
 }
 
 int Squirrel_PrintToServer(SquirrelScript script)
@@ -925,6 +925,44 @@ int Squirrel_PrintToServer(SquirrelScript script)
 		return 0;
 	}
 	Msg(toprint);
+	return 0;
+}
+
+int Squirrel_SendKeyHintToClient(SquirrelScript script)
+{
+	const char* text;
+	if (!g_pSquirrel->GetArgs(script, "s", &text))
+	{
+		return 0;
+	}
+	CReliableBroadcastRecipientFilter user;
+	UserMessageBegin(user, "KeyHintText");
+	WRITE_BYTE(1);	// one message
+	WRITE_STRING(text);
+	MessageEnd();
+	return 0;
+}
+
+
+int Squirrel_SendKeyHintToAll(SquirrelScript script)
+{
+	const char* text;
+	int index;
+	if (!g_pSquirrel->GetArgs(script, "is", &index, &text))
+	{
+		return 0;
+	}
+	CBasePlayer* pl = UTIL_PlayerByIndex(index);
+	if (!pl)
+	{
+		return 0;
+	}
+	CSingleUserRecipientFilter user(pl);
+
+	UserMessageBegin(user, "KeyHintText");
+	WRITE_BYTE(1);	// one message
+	WRITE_STRING(text);
+	MessageEnd();
 	return 0;
 }
 
@@ -949,7 +987,8 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "GetConvar", Squirrel_GetConvar);
 		g_pSquirrel->AddFunction(script, "SetVelocity", Squirrel_SetVelocity);
 		g_pSquirrel->AddFunction(script, "PrintToServer", Squirrel_PrintToServer);
-
+		g_pSquirrel->AddFunction(script, "SendKeyHintToAll", Squirrel_SendKeyHintToAll);
+		g_pSquirrel->AddFunction(script, "SendKeyHintToClient", Squirrel_SendKeyHintToClient);
 		
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)

@@ -130,6 +130,8 @@
 #include "tier0/memdbgon.h"
 
 #define CHAT_WIDTH_PERCENTAGE 0.6f
+//TEAM_COMBINE
+//stop
 
 #ifndef _XBOX
 ConVar hud_saytext_time( "hud_saytext_time", "12", 0 );
@@ -147,7 +149,9 @@ Color g_ColorDarkGreen( 64, 255, 64, 255 );
 Color g_ColorYellow( 255, 178, 0, 255 );
 Color g_ColorGrey( 204, 204, 204, 255 );
 Color g_ColorWhite( 255, 255, 255, 255 );
-
+Color g_ColorActualYellow(255, 255, 0, 255);
+//yellow
+//yeah forgot 
 
 // removes all color markup characters, so Msg can deal with the string properly
 // returns a pointer to str

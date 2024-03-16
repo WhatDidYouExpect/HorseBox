@@ -2,7 +2,7 @@
 {
 	"game"		"JBMod:CE"
 	"title"		"JBMod:CE"
-	"title2"		"0.0.3"
+	"title2"		"0.0.4"
 	"FileSystem"
 	{
 		"SteamAppId"		"320"
