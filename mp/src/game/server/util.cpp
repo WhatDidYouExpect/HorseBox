@@ -502,6 +502,7 @@ void UTIL_Remove( CBaseEntity *oldObj )
 {
 	if ( !oldObj )
 		return;
+	
 	UTIL_Remove( oldObj->NetworkProp() );
 }
 

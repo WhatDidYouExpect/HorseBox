@@ -317,6 +317,10 @@ Vector CPropCrane::BodyTarget( const Vector &posSrc, bool bNoisy )
 //-----------------------------------------------------------------------------
 void CPropCrane::Think(void)
 {
+	if (!m_hCraneMagnet.Get())
+	{
+		return;
+	}
 	SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if ( GetDriver() )

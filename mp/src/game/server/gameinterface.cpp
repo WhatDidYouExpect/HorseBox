@@ -3034,11 +3034,14 @@ void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
 	CBasePlayer *pPlayer = ToBasePlayer( GetContainingEntity( pEntity ) );
 
 	
-	::ClientCommand( pPlayer, args );
 	for (int i = 0; i < squirrelscripts.Count(); i++)
 	{
-		g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientExecCmd", "is", pPlayer->entindex(), args.GetCommandString());
+		if(pPlayer)
+			g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientExecCmd", "is", pPlayer->entindex(), args.GetCommandString());
+		else
+			g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientExecCmd", "is", 0, args.GetCommandString());
 	}
+	::ClientCommand( pPlayer, args );
 }
 
 //-----------------------------------------------------------------------------

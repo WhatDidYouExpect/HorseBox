@@ -6321,7 +6321,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		break;
 	case	203:// remove creature.
 		pEntity = FindEntityForward( this, true );
-		if ( pEntity )
+		if ( pEntity && !pEntity->ClassMatches("player") && !pEntity->ClassMatches("info_player_*"))
 		{
 			UTIL_Remove( pEntity );
 //			if ( pEntity->m_takedamage )

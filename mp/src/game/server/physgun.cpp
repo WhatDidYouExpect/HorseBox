@@ -971,7 +971,11 @@ void CWeaponGravityGun::SoundUpdate( void )
 
 			// blend the "mass" sounds between 50 and 500 kg
 			IPhysicsObject *pPhys = m_hObject->VPhysicsGetObject();
-			
+			if (!pPhys)
+			{
+				SoundStop();
+				return;
+			}
 			float fade = UTIL_LineFraction( pPhys->GetMass(), 50, 500, 1.0 );
 
 			if ( GetParametersForSound( "Weapon_Physgun.LightObject", params, NULL ) )

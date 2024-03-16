@@ -5086,9 +5086,9 @@ void CC_Ent_Remove( const CCommand& args )
 			CBaseEntity *ent = NULL;
 			while ( (ent = gEntList.NextEnt(ent)) != NULL )
 			{
-				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
+				if (  ((ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
 					(ent->m_iClassname != NULL_STRING	&& FStrEq(args[1], STRING(ent->m_iClassname))) ||
-					(ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
+					(ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname()))))
 				{
 					pEntity = ent;
 					break;
@@ -5098,7 +5098,7 @@ void CC_Ent_Remove( const CCommand& args )
 	}
 
 	// Found one?
-	if ( pEntity )
+	if ( pEntity && !pEntity->ClassMatches("player") && !pEntity->ClassMatches("info_player_*"))
 	{
 		Msg( "Removed %s(%s)\n", STRING(pEntity->m_iClassname), pEntity->GetDebugName() );
 		UTIL_Remove( pEntity );
@@ -5121,9 +5121,10 @@ void CC_Ent_RemoveAll( const CCommand& args )
 		CBaseEntity *ent = NULL;
 		while ( (ent = gEntList.NextEnt(ent)) != NULL )
 		{
-			if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
+			if (  ((ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
 				  (ent->m_iClassname != NULL_STRING	&& FStrEq(args[1], STRING(ent->m_iClassname))) ||
-				  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
+				  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))&& !ent->ClassMatches("player")
+				&& !ent->ClassMatches("info_player_*"))
 			{
 				UTIL_Remove( ent );
 				iCount++;
@@ -7356,10 +7357,14 @@ void CC_Ent_Create( const CCommand& args )
 				return;
 		}
 	}
+	else if (!Q_stricmp(args[1], "player"))
+	{
+		return;
+	}
 
 	bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
 	CBaseEntity::SetAllowPrecache( true );
-
+	
 	// Try to create entity
 	CBaseEntity *entity = dynamic_cast< CBaseEntity * >( CreateEntityByName(args[1]) );
 	if (entity)
