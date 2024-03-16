@@ -6,7 +6,7 @@
 class CSquirrel : public ISquirrel
 {
 public:
-	virtual SquirrelScript LoadScript(const char* script, SquirrelAllocator allocator);
+	virtual SquirrelScript LoadScript(const char* script);
 	virtual SquirrelValue CallFunction(SquirrelScript script, const char* fun, const char* types, ...);
 	virtual void ShutdownScript(SquirrelScript script);
 	virtual void AddFunction(SquirrelScript script, const char* name, SquirrelFunction fun);
@@ -15,7 +15,7 @@ public:
 
 };
 
-SquirrelScript CSquirrel::LoadScript(const char* script,SquirrelAllocator allocator)
+SquirrelScript CSquirrel::LoadScript(const char* script)
 {
 	HSQUIRRELVM v = sq_open(2048);
 	sq_pushroottable(v);

@@ -127,7 +127,7 @@
 #include "sourcevr/isourcevirtualreality.h"
 #include "client_virtualreality.h"
 #include "mumble.h"
-//#include "lua/lua.h"
+#include "squirrel/squirrel.h"
 
 // NVNT includes
 #include "hud_macros.h"
@@ -209,8 +209,8 @@ IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;
 IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
-//ILua* g_pLua = NULL;
-//CUtlVector<LuaScript> luascripts;
+ISquirrel* g_pSquirrel = NULL;
+CUtlVector<SquirrelScript> squirrelscripts;
 #if defined( REPLAY_ENABLED )
 IReplayManager *g_pReplayManager = NULL;
 IReplayMovieManager *g_pReplayMovieManager = NULL;
@@ -1606,26 +1606,26 @@ void CHLClient::View_Fade( ScreenFade_t *pSF )
 	if ( pSF != NULL )
 		vieweffects->Fade( *pSF );
 }
-/*
-int Lua_GetConvar(LuaScript script)
+
+int Squirrel_GetConvar(SquirrelScript script)
 {
 	const char* convarname;
-	if (!g_pLua->GetArgs(script, "s", &convarname))
+	if (!g_pSquirrel->GetArgs(script, "s", &convarname))
 	{
 		return 0;
 	}
 	ConVarRef conv(convarname);
-	LuaValue ret;
-	ret.type = LUA_STRING;
+	SquirrelValue ret;
+	ret.type = SQUIRREL_STRING;
 	ret.val_string = conv.GetString();
-	g_pLua->PushValue(script, ret);
+	g_pSquirrel->PushValue(script, ret);
 	return 1;
 }
 
-int Lua_PrintToClient(LuaScript script)
+int Squirrel_PrintToClient(SquirrelScript script)
 {
 	const char* toprint;
-	if (!g_pLua->GetArgs(script, "s", &toprint))
+	if (!g_pSquirrel->GetArgs(script, "s", &toprint))
 	{
 		return 0;
 	}
@@ -1633,10 +1633,10 @@ int Lua_PrintToClient(LuaScript script)
 	return 0;
 }
 
-int Lua_ExecuteConsoleCommand(LuaScript script)
+int Squirrel_ExecuteConsoleCommand(SquirrelScript script)
 {
 	const char* cmd;
-	if (!g_pLua->GetArgs(script, "s", &cmd))
+	if (!g_pSquirrel->GetArgs(script, "s", &cmd))
 	{
 		return 0;
 	}
@@ -1644,21 +1644,10 @@ int Lua_ExecuteConsoleCommand(LuaScript script)
 	return 0;
 }
 
-void* LuaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
-{
-	(void)ud; (void)osize; //unused
-	if (nsize == 0)
-	{
-		g_pMemAlloc->Free(ptr);
-		return 0;
-	}
-	return g_pMemAlloc->Realloc(ptr, nsize);
-}
-
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
-	if (len < 4 || !(path[len - 4] == '.' && path[len - 3] == 'l' && path[len - 2] == 'u' && path[len - 1] == 'a'))
+	if (len < 4 || !(path[len - 4] == '.' && path[len - 3] == 'n' && path[len - 2] == 'u' && path[len - 1] == 't'))
 		return;
 
 	CUtlBuffer codebuffer;
@@ -1667,32 +1656,36 @@ void LoadMod(const char* path)
 
 	if (g_pFullFileSystem->ReadFile(path, NULL, codebuffer))
 	{
-		LuaScript script = g_pLua->LoadScript((const char*)(codebuffer.Base()), LuaAlloc);
-		g_pLua->AddFunction(script, "ExecuteConsoleCommand", Lua_ExecuteConsoleCommand);
-		g_pLua->AddFunction(script, "GetConvar", Lua_GetConvar);
-		g_pLua->AddFunction(script, "PrintToClient", Lua_PrintToClient);
+		SquirrelScript script = g_pSquirrel->LoadScript((const char*)(codebuffer.Base()));
+		if (!script)
+		{
+			return;
+		}
+		g_pSquirrel->AddFunction(script, "ExecuteConsoleCommand", Squirrel_ExecuteConsoleCommand);
+		g_pSquirrel->AddFunction(script, "GetConvar", Squirrel_GetConvar);
+		g_pSquirrel->AddFunction(script, "PrintToClient", Squirrel_PrintToClient);
 
 
-		LuaValue returned = g_pLua->CallFunction(script, "OnModStart", "");
+		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
 		{
-		case LUA_INT:
-			Msg("Lua %s returned int : %i\n", path, returned.val_int);
+		case SQUIRREL_INT:
+			Msg("Squirrel %s returned int : %i\n", path, returned.val_int);
 			break;
-		case LUA_BOOL:
-			Msg("Lua %s returned bool : %s\n", path, returned.val_bool ? "true" : "false");
+		case SQUIRREL_BOOL:
+			Msg("Squirrel %s returned bool : %s\n", path, returned.val_bool ? "true" : "false");
 			break;
-		case LUA_FLOAT:
-			Msg("Lua %s returned float : %f\n", path, returned.val_float);
+		case SQUIRREL_FLOAT:
+			Msg("Squirrel %s returned float : %f\n", path, returned.val_float);
 			break;
-		case LUA_STRING:
-			Msg("Lua %s returned string : %s\n", path, returned.val_string);
+		case SQUIRREL_STRING:
+			Msg("Squirrel %s returned string : %s\n", path, returned.val_string);
 			break;
 		default:
-			Msg("Lua %s failed to execute/return a value\n");
+			Msg("Squirrel %s failed to execute/return a value\n",path);
 			break;
 		}
-		luascripts.AddToTail(script);
+		squirrelscripts.AddToTail(script);
 	}
 }
 
@@ -1730,7 +1723,7 @@ void LoadFilesInDirectory(const char* modname, const char* folder, const char* f
 		pszFileName = g_pFullFileSystem->FindNext(findHandle);
 	}
 }
-*/
+
 
 
 //-----------------------------------------------------------------------------
@@ -1805,13 +1798,13 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		CReplayRagdollRecorder::Instance().Init();
 	}
 #endif
-	/*
-	for (int i = 0; i < luascripts.Count(); ++i)
+	
+	for (int i = 0; i < squirrelscripts.Count(); ++i)
 	{
-		g_pLua->ShutdownScript(luascripts[i]);
+		g_pSquirrel->ShutdownScript(squirrelscripts[i]);
 	}
 	
-	luascripts.RemoveAll();
+	squirrelscripts.RemoveAll();
 
 	FileFindHandle_t findHandle;
 	const char* pszFileName = g_pFullFileSystem->FindFirst("mods/*", &findHandle);
@@ -1830,7 +1823,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		}
 		pszFileName = g_pFullFileSystem->FindNext(findHandle);
 	}
-	*/
+	
 }
 
 

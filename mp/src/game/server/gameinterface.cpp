@@ -928,17 +928,6 @@ int Squirrel_PrintToServer(SquirrelScript script)
 	return 0;
 }
 
-void* SquirrelAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
-{
-	(void)ud; (void)osize; //unused
-	if (nsize == 0)
-	{
-		g_pMemAlloc->Free(ptr);
-		return 0;
-	}
-	return g_pMemAlloc->Realloc(ptr,nsize);
-}
-
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -951,7 +940,11 @@ void LoadMod(const char* path)
 
 	if (g_pFullFileSystem->ReadFile(path, NULL, codebuffer))
 	{
-		SquirrelScript script = g_pSquirrel->LoadScript((const char*)(codebuffer.Base()), SquirrelAlloc);
+		SquirrelScript script = g_pSquirrel->LoadScript((const char*)(codebuffer.Base()));
+		if (!script)
+		{
+			return;
+		}
 		g_pSquirrel->AddFunction(script, "FindEntityByClassname", Squirrel_FindEntityByClassname);
 		g_pSquirrel->AddFunction(script, "GetConvar", Squirrel_GetConvar);
 		g_pSquirrel->AddFunction(script, "SetVelocity", Squirrel_SetVelocity);

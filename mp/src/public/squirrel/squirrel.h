@@ -32,7 +32,7 @@ typedef void* (*SquirrelAllocator) (void* ud, void* ptr, size_t osize, size_t ns
 class ISquirrel
 {
 public:
-	virtual SquirrelScript LoadScript(const char* script, SquirrelAllocator allocator) = 0;
+	virtual SquirrelScript LoadScript(const char* script) = 0;
 	virtual SquirrelValue CallFunction(SquirrelScript script, const char* fun, const char* types, ...) = 0;
 	virtual void ShutdownScript(SquirrelScript script) = 0;
 	virtual void AddFunction(SquirrelScript script, const char* name, SquirrelFunction fun) = 0;
