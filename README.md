@@ -4,7 +4,7 @@
 
 <div align="center">
 
-<iframe src="https://img.shields.io/discord/1201317409013895270?style=plastic">
+[Discord](https://img.shields.io/discord/1201317409013895270?style=plastic)
 
 </div>
 
