@@ -28,4 +28,5 @@ Meaning you need:
 * C++ MFC Library for latest v143 build tools (x86 and x64)
 * Windows 11 SDK (10.0.22000.0)
 * Microsoft Visual Studio 2022
+
 To be able to compile the solution
