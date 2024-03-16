@@ -34,6 +34,9 @@ $Project "squirrel"
 		$File	"sqbaselib.cpp"
 		$File	"sqapi.cpp"
 		$File	"squirrel.cpp"
+		$File	"sqstdstring.cpp"
+		$File	"sqstdmath.cpp"
+		$File	"sqstdrex.cpp"
 	}
 }
 

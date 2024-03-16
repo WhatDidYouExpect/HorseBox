@@ -928,7 +928,7 @@ int Squirrel_PrintToServer(SquirrelScript script)
 	return 0;
 }
 
-int Squirrel_SendKeyHintToClient(SquirrelScript script)
+int Squirrel_SendKeyHintToAll(SquirrelScript script)
 {
 	const char* text;
 	if (!g_pSquirrel->GetArgs(script, "s", &text))
@@ -944,7 +944,7 @@ int Squirrel_SendKeyHintToClient(SquirrelScript script)
 }
 
 
-int Squirrel_SendKeyHintToAll(SquirrelScript script)
+int Squirrel_SendKeyHintToClient(SquirrelScript script)
 {
 	const char* text;
 	int index;

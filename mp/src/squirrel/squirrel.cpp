@@ -2,6 +2,8 @@
 #include "../public/squirrel/squirrel.h"
 #include "tier1/interface.h"
 #include <stdarg.h>
+#include "sqstdstring.h"
+#include "sqstdmath.h"
 
 class CSquirrel : public ISquirrel
 {
@@ -19,6 +21,8 @@ SquirrelScript CSquirrel::LoadScript(const char* script)
 {
 	HSQUIRRELVM v = sq_open(2048);
 	sq_pushroottable(v);
+	sqstd_register_mathlib(v);
+	sqstd_register_stringlib(v);
 	sq_compilebuffer(v, script, strlen(script),"squirrel",SQTrue);
 	sq_pushroottable(v);
 	if(SQ_FAILED(sq_call(v, 1, false, true)))

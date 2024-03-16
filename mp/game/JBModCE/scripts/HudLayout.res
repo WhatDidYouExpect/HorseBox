@@ -244,9 +244,9 @@
 		"wide"	 "628"
 		"tall"	 "468"
 
-		"MaxDeathNotices" "4"
+		"MaxDeathNotices" "10"
 		"LineHeight"	  "22"
-		"RightJustify"	  "1"	// If 1, draw notices from the right
+		"RightJustify"	  "0"	// If 1, draw notices from the right
 
 		"TextFont"				"Default"
 	}
@@ -386,13 +386,35 @@
 
 	HudHintDisplay
 	{
-		"fieldName"	"HudHintDisplay"
+		"fieldName"				"HudHintDisplay"
+		"visible"				"0"
+		"enabled"				"1"
+		"xpos"					"c-240"
+		"ypos"					"c60"
+		"xpos"	"r148"	[$X360]
+		"ypos"	"r338"	[$X360]
+		"wide"					"480"
+		"tall"					"100"
+		"HintSize"				"1"
+		"text_xpos"				"8"
+		"text_ypos"				"8"
+		"center_x"				"0"	// center text horizontally
+		"center_y"				"-1"	// align text on the bottom
+		"paintbackground"		"0"
+	}	
+	
+	
+	HudHintKeyDisplay
+	{
+		"fieldName"	"HudHintKeyDisplay"
 		"visible"	"0"
-		"enabled" "1"
-		"xpos"	"r120"
-		"ypos"	"r340"
-		"wide"	"100"
-		"tall"	"200"
+		"enabled" 	"1"
+		"xpos"		"r120"	[$WIN32]
+		"ypos"		"r340"	[$WIN32]
+		"xpos"		"r148"	[$X360]
+		"ypos"		"r338"	[$X360]
+		"wide"		"100"
+		"tall"		"200"
 		"text_xpos"	"8"
 		"text_ypos"	"8"
 		"text_xgap"	"8"
@@ -401,7 +423,6 @@
 
 		"PaintBackgroundType"	"2"
 	}
-
 	HudSquadStatus
 	{
 		"fieldName"	"HudSquadStatus"
@@ -496,10 +517,16 @@
 		"enabled"	"0"
 	}
 	
-	"CHudVote"
+	CHudVote
 	{
 		"fieldName"		"CHudVote"
-		"visible"		"0"
-		"enabled"		"0"
-	}
+		"xpos"			"0"			
+		"ypos"			"0"
+		"wide"			"640"
+		"tall"			"480"
+		"visible"		"1"
+		"enabled"		"1"
+		"bgcolor_override"	"0 0 0 0"
+		"PaintBackgroundType"	"0" // rounded corners
+	}	
 }
