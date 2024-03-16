@@ -12,6 +12,7 @@ JBMod CE is a Community Edition of JBMod that has more advanced features such as
 <li>Squirrel</li>
 <li>The absolutely totally originally original and never-done-before readdition of the beta physics gun</li>
 <li>and a cool HUD</li>
+
 # Info
 There is a Wiki for JBMod CE [here](https://jbased-group.github.io/wiki)
 
