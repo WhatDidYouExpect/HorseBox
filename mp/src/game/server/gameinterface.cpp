@@ -2902,6 +2902,8 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 //-----------------------------------------------------------------------------
 void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 {
+	
+
 	MDLCACHE_CRITICAL_SECTION();
 	
 	::ClientActive( pEdict, bLoadGame );
@@ -2922,7 +2924,10 @@ void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
 	CSoundEnvelopeController::GetController().CheckLoopingSoundsForPlayer( pPlayer );
 	SceneManager_ClientActive( pPlayer );
-
+	for (int i = 0; i < squirrelscripts.Count(); i++)
+	{
+		g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientActive", "i", pPlayer->entindex());
+	}
 	#if defined( TF_DLL )
 		Assert( pPlayer );
 		if ( pPlayer && !pPlayer->IsFakeClient() && !pPlayer->IsHLTV() && !pPlayer->IsReplay() )
