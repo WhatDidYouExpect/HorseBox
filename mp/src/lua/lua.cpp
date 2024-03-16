@@ -7,7 +7,7 @@
 class CLua : public ILua
 {
 public:
-	virtual LuaScript LoadScript(const char* script);
+	virtual LuaScript LoadScript(const char* script, LuaAllocator allocator);
 	virtual LuaValue CallFunction(LuaScript script, const char* fun, const char* types, ...);
 	virtual void ShutdownScript(LuaScript script);
 	virtual void AddFunction(LuaScript script, const char* name, LuaFunction fun);
@@ -15,9 +15,9 @@ public:
 	virtual void PushValue(LuaScript script, LuaValue val);
 };
 
-LuaScript CLua::LoadScript(const char* script)
+LuaScript CLua::LoadScript(const char* script,LuaAllocator allocator)
 {
-	lua_State* L = luaL_newstate();
+	lua_State* L = lua_newstate((lua_Alloc)allocator,0);
 	luaL_openlibs(L);
 	luaL_loadstring(L,script);
 	if (lua_pcall(L, 0, 0, 0))
