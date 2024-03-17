@@ -125,6 +125,7 @@ public:
 	float	m_fAutoSaveDangerousTime;
 	float	m_fAutoSaveDangerousMinHealthToCommit;
 	bool	m_bIsHibernating;
+	bool	m_bAfterFirstFrame;
 
 	// Called after the steam API has been activated post-level startup
 	virtual void			GameServerSteamAPIActivated( void ) OVERRIDE;

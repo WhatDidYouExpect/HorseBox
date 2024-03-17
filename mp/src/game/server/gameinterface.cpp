@@ -869,17 +869,14 @@ int Squirrel_FindEntityByClassname(SquirrelScript script)
 	{
 		return 0;
 	}
-	CBaseEntity* ent = gEntList.FindEntityByClassname(gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(firstent)),name);
+	CBaseEntity* ent = gEntList.FindEntityByClassname(UTIL_EntityByIndex(firstent), name);
+	if (!ent)
+	{
+		return 0;
+	}
 	SquirrelValue ret;
-	if (ent)
-	{
-		ret.val_int = ent->entindex();
-		ret.type = SQUIRREL_INT;
-	}
-	else
-	{
-		ret.type = SQUIRREL_INVALID;
-	}
+	ret.type = SQUIRREL_INT;
+	ret.val_int = ent->entindex();
 	g_pSquirrel->PushValue(script, ret);
 	return 1;
 }
@@ -894,7 +891,7 @@ int Squirrel_EntitySetVelocity(SquirrelScript script)
 	{
 		return 0;
 	}
-	CBaseEntity* baseent = gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(ent));
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
 	if (baseent)
 	{
 		baseent->Teleport(NULL, NULL, new Vector(x, y, z));
@@ -1147,7 +1144,7 @@ int Squirrel_EntitySetPosition(SquirrelScript script)
 	{
 		return 0;
 	}
-	CBaseEntity* baseent = gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(ent));
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
 	if (baseent)
 	{
 		baseent->Teleport(new Vector(x, y, z), NULL, NULL);
@@ -1163,11 +1160,186 @@ int Squirrel_EntitySetRotation(SquirrelScript script)
 	{
 		return 0;
 	}
-	CBaseEntity* baseent = gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(ent));
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
 	if (baseent)
 	{
 		baseent->Teleport(NULL, new QAngle(x, y, z), NULL);
 	}
+	return 0;
+}
+
+int Squirrel_GiveAmmo(SquirrelScript script)
+{
+	int client, amount;
+	const char* name;
+	bool surpressSound;
+	if (!g_pSquirrel->GetArgs(script, "iisb", &client, &amount, &name, &surpressSound))
+	{
+		return 0;
+	}
+	CBasePlayer* baseent = UTIL_PlayerByIndex(client);
+	if (!baseent)
+	{
+		return 0;
+	}
+	baseent->GiveAmmo(amount, name,surpressSound);
+	return 0;
+}
+
+int Squirrel_GetMapName(SquirrelScript script)
+{
+	SquirrelValue ret;
+	ret.type = SQUIRREL_STRING;
+	ret.val_string = gpGlobals->mapname.ToCStr();
+	g_pSquirrel->PushValue(script, ret);
+	return 1;
+}
+
+int Squirrel_FindEntityByName(SquirrelScript script)
+{
+	const char* name;
+	int firstent, searchingent;
+	if (!g_pSquirrel->GetArgs(script, "sii", &name, &firstent, &searchingent))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = gEntList.FindEntityByName(UTIL_EntityByIndex(firstent), name, UTIL_EntityByIndex(searchingent));
+	if (!ent)
+	{
+		return 0;
+	}
+	SquirrelValue ret;
+	ret.type = SQUIRREL_INT;
+	ret.val_int = ent->entindex();
+	g_pSquirrel->PushValue(script, ret);
+	return 1;
+}
+
+int Squirrel_EntityRemove(SquirrelScript script)
+{
+	int id;
+	if (!g_pSquirrel->GetArgs(script, "i", &id))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent || ent->ClassMatches("player") || ent->ClassMatches("worldspawn"))
+	{
+		return 0;
+	}
+	UTIL_Remove(ent);
+	return 0;
+}
+
+int Squirrel_GetClientWeapons(SquirrelScript script)
+{
+	int id;
+	if (!g_pSquirrel->GetArgs(script, "i", &id))
+	{
+		return 0;
+	}
+	CBasePlayer* ent = UTIL_PlayerByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	g_pSquirrel->PushArray(script);
+	SquirrelValue ret;
+	ret.type = SQUIRREL_INT;
+	for (int i = 0; i < MAX_WEAPONS; i++)
+	{
+		CBaseCombatWeapon* wpn = ent->GetWeapon(i);
+		if (!wpn)
+		{
+			ret.val_int = -1;
+		}
+		else
+		{
+			ret.val_int = wpn->entindex();
+		}
+		g_pSquirrel->PushValue(script,ret);
+		g_pSquirrel->AppendToArray(script);
+	}
+	return 1;
+}
+
+int Squirrel_EntityFireInputBool(SquirrelScript script)
+{
+	int id, activator, caller;
+	const char* inName;
+	bool value;
+	variant_t variant;
+	if (!g_pSquirrel->GetArgs(script, "isiib", &id, &inName, &activator, &caller, &value))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	variant.SetBool(value);
+	ent->AcceptInput(inName, UTIL_EntityByIndex(activator), UTIL_EntityByIndex(caller), variant,0);
+	return 0;
+}
+
+int Squirrel_EntityFireInputInt(SquirrelScript script)
+{
+	int id, activator, caller;
+	const char* inName;
+	int value;
+	variant_t variant;
+	if (!g_pSquirrel->GetArgs(script, "isiii", &id, &inName, &activator, &caller, &value))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	variant.SetInt(value);
+	ent->AcceptInput(inName, UTIL_EntityByIndex(activator), UTIL_EntityByIndex(caller), variant, 0);
+	return 0;
+}
+
+int Squirrel_EntityFireInputFloat(SquirrelScript script)
+{
+	int id, activator, caller;
+	const char* inName;
+	float value;
+	variant_t variant;
+	if (!g_pSquirrel->GetArgs(script, "isiif", &id, &inName, &activator, &caller, &value))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	variant.SetFloat(value);
+	ent->AcceptInput(inName, UTIL_EntityByIndex(activator), UTIL_EntityByIndex(caller), variant, 0);
+	return 0;
+}
+
+int Squirrel_EntityFireInputString(SquirrelScript script)
+{
+	int id, activator, caller;
+	const char* inName;
+	const char* value;
+	variant_t variant;
+	if (!g_pSquirrel->GetArgs(script, "isiis", &id, &inName, &activator, &caller, &value))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	variant.SetString(MAKE_STRING(value));
+	ent->AcceptInput(inName, UTIL_EntityByIndex(activator), UTIL_EntityByIndex(caller), variant, 0);
 	return 0;
 }
 
@@ -1204,6 +1376,15 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "EntityGetVelocity", Squirrel_EntityGetVelocity);
 		g_pSquirrel->AddFunction(script, "EntitySetRotation", Squirrel_EntitySetRotation);
 		g_pSquirrel->AddFunction(script, "EntitySetPosition", Squirrel_EntitySetPosition);
+		g_pSquirrel->AddFunction(script, "GiveAmmo", Squirrel_GiveAmmo);
+		g_pSquirrel->AddFunction(script, "GetMapName", Squirrel_GetMapName);
+		g_pSquirrel->AddFunction(script, "EntityRemove", Squirrel_EntityRemove);
+		g_pSquirrel->AddFunction(script, "GetClientWeapons", Squirrel_GetClientWeapons);
+		g_pSquirrel->AddFunction(script, "EntityFireInputBool", Squirrel_EntityFireInputBool);
+		g_pSquirrel->AddFunction(script, "EntityFireInputFloat", Squirrel_EntityFireInputFloat);
+		g_pSquirrel->AddFunction(script, "EntityFireInputInt", Squirrel_EntityFireInputInt);
+		g_pSquirrel->AddFunction(script, "EntityFireInputString", Squirrel_EntityFireInputString);
+		g_pSquirrel->AddFunction(script, "FindEntityByName", Squirrel_FindEntityByName);
 
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
@@ -1267,6 +1448,7 @@ void LoadFilesInDirectory(const char* modname, const char* folder, const char* f
 // This is called when a new game is started. (restart, map)
 bool CServerGameDLL::GameInit( void )
 {
+	m_bAfterFirstFrame = false;
 	ResetGlobalState();
 	engine->ServerCommand( "exec game.cfg\n" );
 	engine->ServerExecute( );
@@ -1719,6 +1901,14 @@ void CServerGameDLL::GameFrame( bool simulating )
 	g_NetworkPropertyEventMgr.FireEvents();
 
 	gpGlobals->frametime = oldframetime;
+	if (!m_bAfterFirstFrame)
+	{
+		for (int i = 0; i < squirrelscripts.Count(); i++)
+		{
+			g_pSquirrel->CallFunction(squirrelscripts[i], "OnFirstGameFrame", "");
+		}
+		m_bAfterFirstFrame = true;
+	}
 
 	for (int i = 0; i < squirrelscripts.Count(); i++)
 	{
