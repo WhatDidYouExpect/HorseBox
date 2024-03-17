@@ -1083,6 +1083,94 @@ int Squirrel_EntityGetPosition(SquirrelScript script)
 	return 1;
 }
 
+int Squirrel_EntityGetRotation(SquirrelScript script)
+{
+	int ent;
+	if (!g_pSquirrel->GetArgs(script, "i", &ent))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
+	if (!baseent)
+	{
+		return 0;
+	}
+	QAngle pos = baseent->GetAbsAngles();
+	SquirrelValue ret;
+	ret.type = SQUIRREL_FLOAT;
+	ret.val_float = pos.x;
+	g_pSquirrel->PushArray(script);
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	ret.val_float = pos.y;
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	ret.val_float = pos.z;
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	return 1;
+}
+
+int Squirrel_EntityGetVelocity(SquirrelScript script)
+{
+	int ent;
+	if (!g_pSquirrel->GetArgs(script, "i", &ent))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
+	if (!baseent)
+	{
+		return 0;
+	}
+	Vector pos = baseent->GetAbsVelocity();
+	SquirrelValue ret;
+	ret.type = SQUIRREL_FLOAT;
+	ret.val_float = pos.x;
+	g_pSquirrel->PushArray(script);
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	ret.val_float = pos.y;
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	ret.val_float = pos.z;
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	return 1;
+}
+
+int Squirrel_EntitySetPosition(SquirrelScript script)
+{
+	int ent;
+	float x, y, z;
+	if (!g_pSquirrel->GetArgs(script, "ifff", &ent, &x, &y, &z))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(ent));
+	if (baseent)
+	{
+		baseent->Teleport(new Vector(x, y, z), NULL, NULL);
+	}
+	return 0;
+}
+
+int Squirrel_EntitySetRotation(SquirrelScript script)
+{
+	int ent;
+	float x, y, z;
+	if (!g_pSquirrel->GetArgs(script, "ifff", &ent, &x, &y, &z))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = gEntList.GetBaseEntity(gEntList.GetNetworkableHandle(ent));
+	if (baseent)
+	{
+		baseent->Teleport(NULL, new QAngle(x, y, z), NULL);
+	}
+	return 0;
+}
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -1112,7 +1200,11 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "SetEntityKeyvalue", Squirrel_EntitySetKeyvalue);
 		g_pSquirrel->AddFunction(script, "SpawnEntity", Squirrel_EntitySpawn);
 		g_pSquirrel->AddFunction(script, "EntityGetPosition", Squirrel_EntityGetPosition);
-		
+		g_pSquirrel->AddFunction(script, "EntityGetRotation", Squirrel_EntityGetRotation);
+		g_pSquirrel->AddFunction(script, "EntityGetVelocity", Squirrel_EntityGetVelocity);
+		g_pSquirrel->AddFunction(script, "EntitySetRotation", Squirrel_EntitySetRotation);
+		g_pSquirrel->AddFunction(script, "EntitySetPosition", Squirrel_EntitySetPosition);
+
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
 		{
