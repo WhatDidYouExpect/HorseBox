@@ -11,4 +11,5 @@ function OnClientSpawned(client)
 {
 	PrintToServer(client.tostring()+"\n")
 	SendKeyHintToClient(client,"BRUBURBURU");
+	GiveNamedItem(client,"weapon_ar2",0);
 }

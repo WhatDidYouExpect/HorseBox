@@ -985,6 +985,24 @@ int Squirrel_GetPlayerName(SquirrelScript script)
 	return 0;
 }
 
+
+int Squirrel_GiveNamedItem(SquirrelScript script)
+{
+	int client, subtype;
+	const char* item;
+	if (!g_pSquirrel->GetArgs(script, "isi", &client, &item, &subtype))
+	{
+		return 0;
+	}
+	CBasePlayer* baseent = UTIL_PlayerByIndex(client);
+	if (!baseent)
+	{
+		return 0;
+	}
+	baseent->GiveNamedItem(item,subtype);
+	return 0;
+}
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -1009,6 +1027,7 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "SendKeyHintToAll", Squirrel_SendKeyHintToAll);
 		g_pSquirrel->AddFunction(script, "SendKeyHintToClient", Squirrel_SendKeyHintToClient);
 		g_pSquirrel->AddFunction(script, "GetPlayerName", Squirrel_GetPlayerName);
+		g_pSquirrel->AddFunction(script, "GiveNamedItem", Squirrel_GiveNamedItem);
 		
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
