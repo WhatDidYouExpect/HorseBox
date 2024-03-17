@@ -6,3 +6,9 @@ function OnClientExecCmd(client,cmd)
 		SendKeyHintToClient(client,cmd.slice(12));
 	}
 }
+
+function OnClientSpawned(client)
+{
+	PrintToServer(client.tostring()+"\n")
+	SendKeyHintToClient(client,"BRUBURBURU");
+}

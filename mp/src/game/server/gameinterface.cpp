@@ -2944,10 +2944,7 @@ void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
 	CSoundEnvelopeController::GetController().CheckLoopingSoundsForPlayer( pPlayer );
 	SceneManager_ClientActive( pPlayer );
-	for (int i = 0; i < squirrelscripts.Count(); i++)
-	{
-		g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientActive", "i", pPlayer->entindex());
-	}
+	
 	#if defined( TF_DLL )
 		Assert( pPlayer );
 		if ( pPlayer && !pPlayer->IsFakeClient() && !pPlayer->IsHLTV() && !pPlayer->IsReplay() )
@@ -3052,6 +3049,10 @@ void CServerGameClients::ClientPutInServer( edict_t *pEntity, const char *player
 		g_pClientPutInServerOverride( pEntity, playername );
 	else
 		::ClientPutInServer( pEntity, playername );
+	for (int i = 0; i < squirrelscripts.Count(); i++)
+	{
+		g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientPutInServer", "i", CBaseEntity::Instance(pEntity)->entindex());
+	}
 }
 
 void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
@@ -3380,6 +3381,14 @@ float CServerGameClients::ProcessUsercmds( edict_t *player, bf_read *buf, int nu
 	}
 
 	MDLCACHE_CRITICAL_SECTION();
+	if (!pPlayer->m_bHasSpawned)
+	{
+		for (int i = 0; i < squirrelscripts.Count(); i++)
+		{
+			g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientSpawned", "i",pPlayer->entindex());
+		}
+		pPlayer->m_bHasSpawned = true;
+	}
 	pPlayer->ProcessUsercmds( cmds, numcmds, totalcmds, dropped_packets, paused );
 
 	return TICK_INTERVAL;
