@@ -14,6 +14,8 @@ public:
 	virtual void AddFunction(SquirrelScript script, const char* name, SquirrelFunction fun);
 	virtual bool GetArgs(SquirrelScript script, const char* types, ...);
 	virtual void PushValue(SquirrelScript script, SquirrelValue val);
+	virtual void PushArray(SquirrelScript script);
+	virtual void AppendToArray(SquirrelScript script);
 
 };
 
@@ -214,6 +216,18 @@ void CSquirrel::PushValue(SquirrelScript script, SquirrelValue val)
 		sq_pushnull(v);
 		break;
 	}
+}
+
+void CSquirrel::PushArray(SquirrelScript script)
+{
+	HSQUIRRELVM v = (HSQUIRRELVM)script;
+	sq_newarray(v, 0);
+}
+
+void CSquirrel::AppendToArray(SquirrelScript script)
+{
+	HSQUIRRELVM v = (HSQUIRRELVM)script;
+	sq_arrayappend(v, -2);
 }
 
 EXPOSE_SINGLE_INTERFACE(CSquirrel, ISquirrel, INTERFACESQUIRREL_VERSION);

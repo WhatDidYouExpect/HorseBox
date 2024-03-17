@@ -38,6 +38,8 @@ public:
 	virtual void AddFunction(SquirrelScript script, const char* name, SquirrelFunction fun) = 0;
 	virtual bool GetArgs(SquirrelScript script, const char* types, ...) = 0;
 	virtual void PushValue(SquirrelScript script, SquirrelValue val) = 0;
+	virtual void PushArray(SquirrelScript script) = 0;
+	virtual void AppendToArray(SquirrelScript script) = 0;
 
 };
 

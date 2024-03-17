@@ -5,6 +5,11 @@ function OnClientExecCmd(client,cmd)
 	{
 		SendKeyHintToClient(client,cmd.slice(12));
 	}
+	else if(startswith(cmd,"GetPosition"))
+	{
+		local pos = EntityGetPosition(client);
+		PrintToServer(pos[0].tostring()+" "+pos[1].tostring()+" "+pos[2].tostring()+"\n");
+	}
 }
 
 function OnClientSpawned(client)

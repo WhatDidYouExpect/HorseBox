@@ -881,12 +881,12 @@ int Squirrel_FindEntityByClassname(SquirrelScript script)
 		ret.type = SQUIRREL_INVALID;
 	}
 	g_pSquirrel->PushValue(script, ret);
-	return 0;
+	return 1;
 }
 
 
 
-int Squirrel_SetVelocity(SquirrelScript script)
+int Squirrel_EntitySetVelocity(SquirrelScript script)
 {
 	int ent;
 	float x, y, z;
@@ -914,7 +914,7 @@ int Squirrel_GetConvar(SquirrelScript script)
 	ret.type = SQUIRREL_STRING;
 	ret.val_string = conv.GetString();
 	g_pSquirrel->PushValue(script, ret);
-	return 0;
+	return 1;
 }
 
 int Squirrel_PrintToServer(SquirrelScript script)
@@ -966,7 +966,7 @@ int Squirrel_SendKeyHintToClient(SquirrelScript script)
 	return 0;
 }
 
-int Squirrel_GetPlayerName(SquirrelScript script)
+int Squirrel_GetClientName(SquirrelScript script)
 {
 	int client;
 	if (!g_pSquirrel->GetArgs(script, "i", &client))
@@ -982,7 +982,7 @@ int Squirrel_GetPlayerName(SquirrelScript script)
 	ret.type = SQUIRREL_STRING;
 	ret.val_string = baseent->GetPlayerName();
 	g_pSquirrel->PushValue(script, ret);
-	return 0;
+	return 1;
 }
 
 
@@ -1001,6 +1001,86 @@ int Squirrel_GiveNamedItem(SquirrelScript script)
 	}
 	baseent->GiveNamedItem(item,subtype);
 	return 0;
+}
+
+int Squirrel_EntityCreate(SquirrelScript script)
+{
+	const char* classname;
+	if (!g_pSquirrel->GetArgs(script, "s", &classname))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = CreateEntityByName(classname);
+	if (!baseent)
+	{
+		return 0;
+	}
+	SquirrelValue ret;
+	ret.type = SQUIRREL_INT;
+	ret.val_int = baseent->entindex();
+	g_pSquirrel->PushValue(script, ret);
+	return 1;
+}
+
+int Squirrel_EntitySetKeyvalue(SquirrelScript script)
+{
+	int ent;
+	const char* key, *value;
+	if (!g_pSquirrel->GetArgs(script, "iss", &ent, &key, &value))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
+	if (!baseent)
+	{
+		return 0;
+	}
+	baseent->KeyValue(key, value);
+	return 0;
+}
+
+int Squirrel_EntitySpawn(SquirrelScript script)
+{
+	int ent;
+	if (!g_pSquirrel->GetArgs(script, "i", &ent))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
+	if (!baseent)
+	{
+		return 0;
+	}
+	DispatchSpawn(baseent);
+	return 0;
+}
+
+int Squirrel_EntityGetPosition(SquirrelScript script)
+{
+	int ent;
+	if (!g_pSquirrel->GetArgs(script, "i", &ent))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
+	if (!baseent)
+	{
+		return 0;
+	}
+	Vector pos = baseent->GetAbsOrigin();
+	SquirrelValue ret;
+	ret.type = SQUIRREL_FLOAT;
+	ret.val_float = pos.x;
+	g_pSquirrel->PushArray(script);
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	ret.val_float = pos.y;
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	ret.val_float = pos.z;
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	return 1;
 }
 
 void LoadMod(const char* path)
@@ -1022,12 +1102,16 @@ void LoadMod(const char* path)
 		}
 		g_pSquirrel->AddFunction(script, "FindEntityByClassname", Squirrel_FindEntityByClassname);
 		g_pSquirrel->AddFunction(script, "GetConvar", Squirrel_GetConvar);
-		g_pSquirrel->AddFunction(script, "SetVelocity", Squirrel_SetVelocity);
+		g_pSquirrel->AddFunction(script, "EntitySetVelocity", Squirrel_EntitySetVelocity);
 		g_pSquirrel->AddFunction(script, "PrintToServer", Squirrel_PrintToServer);
 		g_pSquirrel->AddFunction(script, "SendKeyHintToAll", Squirrel_SendKeyHintToAll);
 		g_pSquirrel->AddFunction(script, "SendKeyHintToClient", Squirrel_SendKeyHintToClient);
-		g_pSquirrel->AddFunction(script, "GetPlayerName", Squirrel_GetPlayerName);
+		g_pSquirrel->AddFunction(script, "GetClientName", Squirrel_GetClientName);
 		g_pSquirrel->AddFunction(script, "GiveNamedItem", Squirrel_GiveNamedItem);
+		g_pSquirrel->AddFunction(script, "CreateEntity", Squirrel_EntityCreate);
+		g_pSquirrel->AddFunction(script, "SetEntityKeyvalue", Squirrel_EntitySetKeyvalue);
+		g_pSquirrel->AddFunction(script, "SpawnEntity", Squirrel_EntitySpawn);
+		g_pSquirrel->AddFunction(script, "EntityGetPosition", Squirrel_EntityGetPosition);
 		
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
