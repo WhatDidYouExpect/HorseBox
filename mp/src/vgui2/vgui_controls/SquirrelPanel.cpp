@@ -12,6 +12,51 @@ void SquirrelPanel::SetPaintFunction(const char* name)
 	strncpy(paintFunction, name,sizeof(paintFunction));
 }
 
+void SquirrelPanel::SetOnKeyDownFunction(const char* name)
+{
+	strncpy(keyDownFunction, name, sizeof(keyDownFunction));
+}
+
+void SquirrelPanel::SetOnKeyUpFunction(const char* name)
+{
+	strncpy(keyUpFunction, name, sizeof(keyUpFunction));
+}
+
+void SquirrelPanel::SetOnMouseDownFunction(const char* name)
+{
+	strncpy(mouseDownFunction, name, sizeof(mouseDownFunction));
+}
+
+void SquirrelPanel::SetOnMouseUpFunction(const char* name)
+{
+	strncpy(mouseUpFunction, name, sizeof(mouseUpFunction));
+}
+
+void SquirrelPanel::OnMousePressed(MouseCode code)
+{
+	if (!mouseDownFunction[0])
+		return;
+	g_pSquirrel->CallFunction(script, mouseDownFunction, "ui", handle, code);
+}
+void SquirrelPanel::OnMouseReleased(MouseCode code)
+{
+	if (!mouseUpFunction[0])
+		return;
+	g_pSquirrel->CallFunction(script, mouseUpFunction, "ui", handle, code);
+}
+void SquirrelPanel::OnKeyCodePressed(KeyCode code)
+{
+	if (!keyDownFunction[0])
+		return;
+	g_pSquirrel->CallFunction(script, keyDownFunction, "ui", handle, code);
+}
+void SquirrelPanel::OnKeyCodeReleased(KeyCode code)
+{
+	if (!keyUpFunction[0])
+		return;
+	g_pSquirrel->CallFunction(script, keyUpFunction, "ui", handle, code);
+}
+
 void SquirrelPanel::Paint()
 {
 	if (!paintFunction[0])

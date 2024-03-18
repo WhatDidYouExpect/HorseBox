@@ -1,15 +1,31 @@
-t <- 0;
-
 function DrawEpicPanel(panel)
 {
-	SurfaceDrawLine(abs(t%100-50),abs(t%84-42),abs((t-10)%100-50),abs((t-10)%84-42));
-	SurfaceDrawLine(abs((t-10)%100-50),abs((t-10)%84-42),abs((t-20)%100-50),abs((t-20)%84-42));
-	t += 1;
+	if(GetConvar("cl_showepicbutton") == "1")
+	{
+		VGUISetMouseInputEnabled(panel,true);
+		ExecuteConsoleCommand("cl_showepicbutton 0");
+	}
+	if(GetConvar("cl_hideepicbutton") == "1")
+	{
+		VGUISetMouseInputEnabled(panel,false);
+		VGUISetKeyBoardInputEnabled(panel,false);
+		ExecuteConsoleCommand("cl_hideepicbutton 0");
+	}
+}
+
+function EpicPress(panel, code)
+{
+	ExecuteConsoleCommand("ent_create prop_physics model models/props_c17/furnituretable002a.mdl");
 }
 
 function LevelInitPreEntity()
 {
+	ExecuteConsoleCommand("setinfo cl_showepicbutton 0");
+	ExecuteConsoleCommand("setinfo cl_hideepicbutton 0");
 	local th = VGUICreatePanel();
 	VGUISetBounds(th,16,16,50,42);
 	VGUISetPaintFunction(th,"DrawEpicPanel");
+	VGUISetOnMouseDownFunction(th,"EpicPress");
+	VGUIMakePopup(th);
+	VGUISetMouseInputEnabled(th,false);
 }

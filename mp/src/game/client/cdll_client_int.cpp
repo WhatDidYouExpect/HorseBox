@@ -1699,6 +1699,8 @@ int Squirrel_VGUICreatePanel(SquirrelScript script)
 	panel->SetPaintBackgroundEnabled(true);
 	panel->SetPaintBackgroundType(2);
 	panel->SetAlpha(255);
+	panel->SetVisible(true);
+	panel->SetEnabled(true);
 	SquirrelValue ret;
 	ret.type = SQUIRREL_USERDATA;
 	ret.val_userdata = hand;
@@ -1719,6 +1721,36 @@ int Squirrel_VGUISetBounds(SquirrelScript script)
 		return 0;
 	}
 	((vgui::SquirrelPanel*)hand->ptr)->SetBounds(x, y, w, t);
+	return 0;
+}
+
+int Squirrel_VGUIRequestFocus(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	if (!g_pSquirrel->GetArgs(script, "u", &hand))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->RequestFocus();
+	return 0;
+}
+
+int Squirrel_VGUIMakePopup(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	if (!g_pSquirrel->GetArgs(script, "u", &hand))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->MakePopup();
 	return 0;
 }
 
@@ -1760,10 +1792,182 @@ int Squirrel_SurfaceDrawLine(SquirrelScript script)
 	{
 		return 0;
 	}
-	vgui::surface()->DrawSetColor(255, 255, 0, 255);
 	vgui::surface()->DrawLine(x1, y1, x2, y2);
 	return 0;
 }
+
+int Squirrel_SurfaceSetColor(SquirrelScript script)
+{
+	int r, g, b, a;
+	if (!g_pSquirrel->GetArgs(script, "iiii", &r, &g,&b,&a))
+	{
+		return 0;
+	}
+	vgui::surface()->DrawSetColor(r,g,b,a);
+	return 0;
+}
+
+int Squirrel_SurfaceDrawText(SquirrelScript script)
+{
+	const char* text;
+	wchar wtext[1024];
+	if (!g_pSquirrel->GetArgs(script, "s", &text))
+	{
+		return 0;
+	}
+	Q_strtowcs(text, -1, wtext, 1024);
+	vgui::surface()->DrawPrintText(wtext,wcslen(wtext));
+	return 0;
+}
+
+int Squirrel_SurfaceSetTextPos(SquirrelScript script)
+{
+	int x, y;
+	if (!g_pSquirrel->GetArgs(script, "ii", &x, &y))
+	{
+		return 0;
+	}
+	vgui::surface()->DrawSetTextPos(x, y);
+	return 0;
+}
+
+
+int Squirrel_SurfaceSetTextColor(SquirrelScript script)
+{
+	int r, g, b, a;
+	if (!g_pSquirrel->GetArgs(script, "iiii", &r,&g,&b,&a))
+	{
+		return 0;
+	}
+	vgui::surface()->DrawSetTextColor(r, g, b, a);
+	return 0;
+}
+
+int Squirrel_SurfaceSetTextFont(SquirrelScript script)
+{
+	const char* scheme, *fontname;
+	if (!g_pSquirrel->GetArgs(script, "ss", &scheme, &fontname))
+	{
+		return 0;
+	}
+	vgui::surface()->DrawSetTextFont(vgui::scheme()->GetIScheme(vgui::scheme()->GetScheme(scheme))->GetFont(fontname));
+	return 0;
+}
+
+int Squirrel_VGUISetKeyBoardInputEnabled(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	bool enabled;
+	if (!g_pSquirrel->GetArgs(script, "ub", &hand, &enabled))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetKeyBoardInputEnabled(enabled);
+	return 0;
+}
+
+int Squirrel_VGUISetMouseInputEnabled(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	bool enabled;
+	if (!g_pSquirrel->GetArgs(script, "ub", &hand, &enabled))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetMouseInputEnabled(enabled);
+	return 0;
+}
+
+int Squirrel_VGUISetVisible(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	bool enabled;
+	if (!g_pSquirrel->GetArgs(script, "ub", &hand, &enabled))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetVisible(enabled);
+	return 0;
+}
+
+
+int Squirrel_VGUISetOnMouseDownFunction(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	const char* func;
+	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetOnMouseDownFunction(func);
+	return 0;
+}
+
+int Squirrel_VGUISetOnMouseUpFunction(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	const char* func;
+	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetOnMouseUpFunction(func);
+	return 0;
+}
+
+int Squirrel_VGUISetOnKeyDownFunction(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	const char* func;
+	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetOnKeyDownFunction(func);
+	return 0;
+}
+
+
+int Squirrel_VGUISetOnKeyUpFunction(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	const char* func;
+	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetOnKeyUpFunction(func);
+	return 0;
+}
+
 
 
 void LoadMod(const char* path)
@@ -1790,7 +1994,21 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "VGUISetBounds", Squirrel_VGUISetBounds);
 		g_pSquirrel->AddFunction(script, "VGUISetParent", Squirrel_VGUISetParent);
 		g_pSquirrel->AddFunction(script, "VGUISetPaintFunction", Squirrel_VGUISetPaintFunction);
+		g_pSquirrel->AddFunction(script, "VGUIRequestFocus", Squirrel_VGUIRequestFocus);
+		g_pSquirrel->AddFunction(script, "VGUIMakePopup", Squirrel_VGUIMakePopup);
 		g_pSquirrel->AddFunction(script, "SurfaceDrawLine", Squirrel_SurfaceDrawLine);
+		g_pSquirrel->AddFunction(script, "SurfaceSetColor", Squirrel_SurfaceSetColor);
+		g_pSquirrel->AddFunction(script, "SurfaceDrawText", Squirrel_SurfaceDrawText);
+		g_pSquirrel->AddFunction(script, "SurfaceSetTextColor", Squirrel_SurfaceSetTextColor);
+		g_pSquirrel->AddFunction(script, "SurfaceSetTextPos", Squirrel_SurfaceSetTextPos);
+		g_pSquirrel->AddFunction(script, "SurfaceSetTextFont", Squirrel_SurfaceSetTextFont);
+		g_pSquirrel->AddFunction(script, "VGUISetOnMouseDownFunction", Squirrel_VGUISetOnMouseDownFunction);
+		g_pSquirrel->AddFunction(script, "VGUISetOnMouseUpFunction", Squirrel_VGUISetOnMouseUpFunction);
+		g_pSquirrel->AddFunction(script, "VGUISetOnKeyDownFunction", Squirrel_VGUISetOnKeyDownFunction);
+		g_pSquirrel->AddFunction(script, "VGUISetOnKeyUpFunction", Squirrel_VGUISetOnKeyUpFunction);
+		g_pSquirrel->AddFunction(script, "VGUISetKeyBoardInputEnabled", Squirrel_VGUISetKeyBoardInputEnabled);
+		g_pSquirrel->AddFunction(script, "VGUISetMouseInputEnabled", Squirrel_VGUISetMouseInputEnabled);
+		g_pSquirrel->AddFunction(script, "VGUISetVisible", Squirrel_VGUISetVisible);
 
 
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
