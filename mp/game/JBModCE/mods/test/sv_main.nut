@@ -1,6 +1,25 @@
 function OnClientExecCmd(client,cmd)
 {
 	PrintToServer(client.tostring()+": "+cmd+"\n");
+	if(startswith(cmd,"SpawnProp "))
+	{
+		local prop = CreateEntity("prop_physics_override");
+		PrintToServer(prop.tostring()+"\n");
+		local pos = EntityGetPosition(client);
+		PrintToServer(pos.tostring()+"\n");
+		EntitySetPosition(prop,pos[0],pos[1],pos[2]);
+		PrintToServer(cmd.slice(10)+"\n");
+		SetEntityKeyvalue(prop,"model",cmd.slice(10));
+		SpawnEntity(prop);
+	}
+}
+
+
+/* tests
+
+function OnClientExecCmd(client,cmd)
+{
+	PrintToServer(client.tostring()+": "+cmd+"\n");
 	if(startswith(cmd,"DisplayHint "))
 	{
 		SendKeyHintToClient(client,cmd.slice(12));
@@ -55,3 +74,5 @@ function OnEntityKilled(ent, damage, attacker, weapon, type)
 
 	}
 }
+
+*/

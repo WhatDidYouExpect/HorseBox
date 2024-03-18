@@ -212,46 +212,40 @@ IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
 ISquirrel* g_pSquirrel = NULL;
 CUtlVector<SquirrelScript> squirrelscripts;
-CUtlStringMap<CUtlMap<int, SquirrelHandle>*> squirrelhandles;
-CUtlStringMap<int> squirrelhandleid;
+CUtlMap<int, void*>* squirrelhandles[SPCOUNT] = {};
+int squirrelhandleid[SPCOUNT] = {};
 
-SquirrelHandle* NewSquirrelHandle(const char* name, void* ptr)
+SquirrelHandle NewSquirrelHandle(int pool, void* ptr)
 {
-	if (!squirrelhandleid.Defined(name))
+	int id = squirrelhandleid[pool];
+	if (!squirrelhandles[pool])
 	{
-		squirrelhandleid[name] = 0;
+		squirrelhandles[pool] = new CUtlMap<int, void*>();
+		SetDefLessFunc(*squirrelhandles[pool]);
 	}
-	int id = squirrelhandleid[name];
-	if (!squirrelhandles.Defined(name))
-	{
-		squirrelhandles[name] = new CUtlMap<int, SquirrelHandle>();
-		SetDefLessFunc(*squirrelhandles[name]);
-	}
-	CUtlMap<int, SquirrelHandle>* handleids = squirrelhandles[name];
+	CUtlMap<int, void*>* handles = squirrelhandles[pool];
+	handles->InsertOrReplace(id,ptr);
+	++squirrelhandleid[pool];
 	SquirrelHandle handle;
-	handle.id = id;
-	handle.name = name;
-	handle.ptr = ptr;
-	handleids->InsertOrReplace(id,handle);
-	++squirrelhandleid[name];
-	return &handleids->operator[](id);
+	handle.poolid = (id<<8) + pool;
+	return handle;
 }
 
-bool CheckSquirrelHandle(SquirrelHandle* handle, const char* name)
+void* CheckSquirrelHandle(SquirrelHandle handle, int pool)
 {
-	if (strcmp(handle->name, name))
+	if(handle.p.pool != pool)
 	{
-		return false;
+		return 0;
 	}
-	if (!squirrelhandles.Defined(handle->name) || !squirrelhandles.Defined(name))
+	if (!squirrelhandles[handle.p.pool] || !squirrelhandles[pool])
 	{
-		return false;
+		return 0;
 	}
-	if (!&squirrelhandles[handle->name]->operator[](handle->id))
+	if (!&squirrelhandles[handle.p.pool]->operator[](handle.poolid >> 8))
 	{
-		return false;
+		return 0;
 	}
-	return true;
+	return squirrelhandles[handle.p.pool]->operator[](handle.poolid >> 8);
 }
 
 #if defined( REPLAY_ENABLED )
@@ -1691,10 +1685,15 @@ int Squirrel_ExecuteConsoleCommand(SquirrelScript script)
 
 int Squirrel_VGUICreatePanel(SquirrelScript script)
 {
+	const char* userdata;
+	if (!g_pSquirrel->GetArgs(script, "s", &userdata))
+	{
+		return 0;
+	}
 	vgui::Panel* viewport = g_pClientMode->GetViewport();
-	SquirrelHandle* hand = NewSquirrelHandle("VGUI", 0);
-	vgui::SquirrelPanel* panel = new vgui::SquirrelPanel(script,hand);
-	hand->ptr = panel;
+	vgui::SquirrelPanel* panel = new vgui::SquirrelPanel(script,userdata);
+	SquirrelHandle hand = NewSquirrelHandle(SP_VGUI, panel);
+	panel->handle = hand;
 	panel->SetParent(viewport);
 	panel->SetPaintBackgroundEnabled(true);
 	panel->SetPaintBackgroundType(2);
@@ -1710,78 +1709,84 @@ int Squirrel_VGUICreatePanel(SquirrelScript script)
 
 int Squirrel_VGUISetBounds(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	int x, y, w, t;
 	if (!g_pSquirrel->GetArgs(script, "uiiii", &hand,&x,&y,&w,&t))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetBounds(x, y, w, t);
+	((vgui::SquirrelPanel*)ptr)->SetBounds(x, y, w, t);
 	return 0;
 }
 
 int Squirrel_VGUIRequestFocus(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	if (!g_pSquirrel->GetArgs(script, "u", &hand))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->RequestFocus();
+	((vgui::SquirrelPanel*)ptr)->RequestFocus();
 	return 0;
 }
 
 int Squirrel_VGUIMakePopup(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	if (!g_pSquirrel->GetArgs(script, "u", &hand))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->MakePopup();
+	((vgui::SquirrelPanel*)ptr)->MakePopup();
 	return 0;
 }
 
 int Squirrel_VGUISetParent(SquirrelScript script)
 {
-	SquirrelHandle* hand, *parent;
+	SquirrelHandle hand, parent;
 	if (!g_pSquirrel->GetArgs(script, "uu", &hand, &parent))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI") || !CheckSquirrelHandle(parent, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	void* parentptr = CheckSquirrelHandle(parent, SP_VGUI);
+	if (!ptr || !parentptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetParent((vgui::SquirrelPanel*)(parent->ptr));
+	((vgui::SquirrelPanel*)ptr)->SetParent((vgui::SquirrelPanel*)(parentptr));
 	return 0;
 }
 
 int Squirrel_VGUISetPaintFunction(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	const char* func;
 	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetPaintFunction(func);
+	((vgui::SquirrelPanel*)ptr)->SetPaintFunction(func);
 	return 0;
 }
 
@@ -1795,6 +1800,18 @@ int Squirrel_SurfaceDrawLine(SquirrelScript script)
 	vgui::surface()->DrawLine(x1, y1, x2, y2);
 	return 0;
 }
+
+int Squirrel_SurfaceDrawRect(SquirrelScript script)
+{
+	int x1, y1, x2, y2;
+	if (!g_pSquirrel->GetArgs(script, "iiii", &x1, &y1, &x2, &y2))
+	{
+		return 0;
+	}
+	vgui::surface()->DrawOutlinedRect(x1, y1, x2, y2);
+	return 0;
+}
+
 
 int Squirrel_SurfaceSetColor(SquirrelScript script)
 {
@@ -1856,119 +1873,160 @@ int Squirrel_SurfaceSetTextFont(SquirrelScript script)
 
 int Squirrel_VGUISetKeyBoardInputEnabled(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	bool enabled;
 	if (!g_pSquirrel->GetArgs(script, "ub", &hand, &enabled))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetKeyBoardInputEnabled(enabled);
+	((vgui::SquirrelPanel*)ptr)->SetKeyBoardInputEnabled(enabled);
 	return 0;
 }
 
 int Squirrel_VGUISetMouseInputEnabled(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	bool enabled;
 	if (!g_pSquirrel->GetArgs(script, "ub", &hand, &enabled))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetMouseInputEnabled(enabled);
+	((vgui::SquirrelPanel*)ptr)->SetMouseInputEnabled(enabled);
 	return 0;
 }
 
 int Squirrel_VGUISetVisible(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	bool enabled;
 	if (!g_pSquirrel->GetArgs(script, "ub", &hand, &enabled))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetVisible(enabled);
+	((vgui::SquirrelPanel*)ptr)->SetVisible(enabled);
 	return 0;
 }
 
 
 int Squirrel_VGUISetOnMouseDownFunction(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	const char* func;
 	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetOnMouseDownFunction(func);
+	((vgui::SquirrelPanel*)ptr)->SetOnMouseDownFunction(func);
 	return 0;
 }
 
 int Squirrel_VGUISetOnMouseUpFunction(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	const char* func;
 	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetOnMouseUpFunction(func);
+	((vgui::SquirrelPanel*)ptr)->SetOnMouseUpFunction(func);
 	return 0;
 }
 
 int Squirrel_VGUISetOnKeyDownFunction(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	const char* func;
 	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetOnKeyDownFunction(func);
+	((vgui::SquirrelPanel*)ptr)->SetOnKeyDownFunction(func);
 	return 0;
 }
 
 
 int Squirrel_VGUISetOnKeyUpFunction(SquirrelScript script)
 {
-	SquirrelHandle* hand;
+	SquirrelHandle hand;
 	const char* func;
 	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
 	{
 		return 0;
 	}
-	if (!CheckSquirrelHandle(hand, "VGUI"))
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
 	{
 		return 0;
 	}
-	((vgui::SquirrelPanel*)hand->ptr)->SetOnKeyUpFunction(func);
+	((vgui::SquirrelPanel*)ptr)->SetOnKeyUpFunction(func);
 	return 0;
 }
 
+int Squirrel_VGUISetPosition(SquirrelScript script)
+{
+	SquirrelHandle hand;
+	int x, y;
+	if (!g_pSquirrel->GetArgs(script, "uii", &hand, &x, &y))
+	{
+		return 0;
+	}
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)ptr)->SetPos(x, y);
+	return 0;
+}
 
+int Squirrel_VGUIGetUserdata(SquirrelScript script)
+{
+	SquirrelHandle hand;
+	if (!g_pSquirrel->GetArgs(script, "u", &hand))
+	{
+		return 0;
+	}
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
+	{
+		return 0;
+	}
+	SquirrelValue ret;
+	ret.type = SQUIRREL_STRING;
+	ret.val_string = ((vgui::SquirrelPanel*)ptr)->GetUserdata();
+	g_pSquirrel->PushValue(script, ret);
+	return 1;
+}
 
 void LoadMod(const char* path)
 {
@@ -1999,6 +2057,7 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "SurfaceDrawLine", Squirrel_SurfaceDrawLine);
 		g_pSquirrel->AddFunction(script, "SurfaceSetColor", Squirrel_SurfaceSetColor);
 		g_pSquirrel->AddFunction(script, "SurfaceDrawText", Squirrel_SurfaceDrawText);
+		g_pSquirrel->AddFunction(script, "SurfaceDrawRect", Squirrel_SurfaceDrawRect);
 		g_pSquirrel->AddFunction(script, "SurfaceSetTextColor", Squirrel_SurfaceSetTextColor);
 		g_pSquirrel->AddFunction(script, "SurfaceSetTextPos", Squirrel_SurfaceSetTextPos);
 		g_pSquirrel->AddFunction(script, "SurfaceSetTextFont", Squirrel_SurfaceSetTextFont);
@@ -2009,6 +2068,8 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "VGUISetKeyBoardInputEnabled", Squirrel_VGUISetKeyBoardInputEnabled);
 		g_pSquirrel->AddFunction(script, "VGUISetMouseInputEnabled", Squirrel_VGUISetMouseInputEnabled);
 		g_pSquirrel->AddFunction(script, "VGUISetVisible", Squirrel_VGUISetVisible);
+		g_pSquirrel->AddFunction(script, "VGUISetPosition", Squirrel_VGUISetPosition);
+		g_pSquirrel->AddFunction(script, "VGUIGetUserdata", Squirrel_VGUIGetUserdata);
 
 
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
@@ -2143,7 +2204,15 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		CReplayRagdollRecorder::Instance().Init();
 	}
 #endif
-	
+	if (squirrelhandles[SP_VGUI])
+	{
+		for (unsigned int i = 0; i < squirrelhandles[SP_VGUI]->Count(); i++)
+		{
+			((vgui::SquirrelPanel*)squirrelhandles[SP_VGUI]->Element(i))->MarkForDeletion();
+		}
+		squirrelhandles[SP_VGUI]->RemoveAll();
+		squirrelhandleid[SP_VGUI] = 0;
+	}
 	for (int i = 0; i < squirrelscripts.Count(); ++i)
 	{
 		g_pSquirrel->ShutdownScript(squirrelscripts[i]);

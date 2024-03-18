@@ -2,9 +2,15 @@
 extern ISquirrel* g_pSquirrel;
 using namespace vgui;
 
-SquirrelPanel::SquirrelPanel(SquirrelScript ownerscript, SquirrelHandle* _handle) : script(ownerscript), handle(_handle)
+SquirrelPanel::SquirrelPanel(SquirrelScript ownerscript, const char* _userdata) : script(ownerscript)
 {
 	paintFunction[0] = '\x00';
+	strncpy(userdata, _userdata, sizeof(userdata));
+}
+
+const char* SquirrelPanel::GetUserdata()
+{
+	return userdata;
 }
 
 void SquirrelPanel::SetPaintFunction(const char* name)

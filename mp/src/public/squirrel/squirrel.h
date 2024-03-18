@@ -15,11 +15,26 @@ enum SquirrelType
 	SQUIRREL_INVALID // must be last
 };
 
-struct SquirrelHandle
+
+#pragma pack(push, 1)
+union SquirrelHandle
 {
-	void* ptr;
-	const char* name;
-	int id;
+	struct PoolId
+	{
+		unsigned char pool;
+		unsigned char id[3];
+	} p;
+	int poolid;
+};
+#pragma pack(pop)
+
+#define SPMASK 0x00ffffff
+
+enum SquirrelPool
+{
+	SP_VGUI,
+
+	SPCOUNT
 };
 
 struct SquirrelValue  // I FUCKING LOVE TYPED UNIONS GRAAAAAAAAAAAAAAAAAAAH
@@ -30,7 +45,7 @@ struct SquirrelValue  // I FUCKING LOVE TYPED UNIONS GRAAAAAAAAAAAAAAAAAAAH
 		float val_float;
 		const char* val_string;
 		bool val_bool;
-		SquirrelHandle* val_userdata;
+		SquirrelHandle val_userdata;
 	};
 	SquirrelType type;
 };
