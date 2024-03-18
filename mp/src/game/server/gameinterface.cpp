@@ -185,6 +185,7 @@ IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;	// Xbox 360 only
 ISquirrel* g_pSquirrel = NULL;
 CUtlVector<SquirrelScript> squirrelscripts;
+CUtlStringMap<CUtlMap<int,SquirrelHandle>> squirrelhandles;
 #if defined( REPLAY_ENABLED )
 IReplaySystem *g_pReplay = NULL;
 IServerReplayContext *g_pReplayServerContext = NULL;

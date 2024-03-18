@@ -134,6 +134,7 @@ class CTreeViewListControl;
 class URLLabel;
 class WizardPanel;
 class WizardSubPanel;
+class SquirrelPanel;
 
 // vgui controls helper classes
 class BuildGroup;

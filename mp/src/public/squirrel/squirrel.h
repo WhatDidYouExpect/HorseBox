@@ -10,8 +10,16 @@ enum SquirrelType
 	SQUIRREL_FLOAT,
 	SQUIRREL_STRING,
 	SQUIRREL_BOOL,
+	SQUIRREL_USERDATA,
 
 	SQUIRREL_INVALID // must be last
+};
+
+struct SquirrelHandle
+{
+	void* ptr;
+	const char* name;
+	int id;
 };
 
 struct SquirrelValue  // I FUCKING LOVE TYPED UNIONS GRAAAAAAAAAAAAAAAAAAAH
@@ -22,12 +30,14 @@ struct SquirrelValue  // I FUCKING LOVE TYPED UNIONS GRAAAAAAAAAAAAAAAAAAAH
 		float val_float;
 		const char* val_string;
 		bool val_bool;
+		SquirrelHandle* val_userdata;
 	};
 	SquirrelType type;
 };
 
 typedef int (*SquirrelFunction)(SquirrelScript);
-typedef void* (*SquirrelAllocator) (void* ud, void* ptr, size_t osize, size_t nsize);
+
+
 
 class ISquirrel
 {
@@ -42,5 +52,7 @@ public:
 	virtual void AppendToArray(SquirrelScript script) = 0;
 
 };
+
+
 
 #endif

@@ -128,6 +128,7 @@
 #include "client_virtualreality.h"
 #include "mumble.h"
 #include "squirrel/squirrel.h"
+#include "vgui_controls/SquirrelPanel.h"
 
 // NVNT includes
 #include "hud_macros.h"
@@ -211,6 +212,48 @@ IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
 ISquirrel* g_pSquirrel = NULL;
 CUtlVector<SquirrelScript> squirrelscripts;
+CUtlStringMap<CUtlMap<int, SquirrelHandle>*> squirrelhandles;
+CUtlStringMap<int> squirrelhandleid;
+
+SquirrelHandle* NewSquirrelHandle(const char* name, void* ptr)
+{
+	if (!squirrelhandleid.Defined(name))
+	{
+		squirrelhandleid[name] = 0;
+	}
+	int id = squirrelhandleid[name];
+	if (!squirrelhandles.Defined(name))
+	{
+		squirrelhandles[name] = new CUtlMap<int, SquirrelHandle>();
+		SetDefLessFunc(*squirrelhandles[name]);
+	}
+	CUtlMap<int, SquirrelHandle>* handleids = squirrelhandles[name];
+	SquirrelHandle handle;
+	handle.id = id;
+	handle.name = name;
+	handle.ptr = ptr;
+	handleids->InsertOrReplace(id,handle);
+	++squirrelhandleid[name];
+	return &handleids->operator[](id);
+}
+
+bool CheckSquirrelHandle(SquirrelHandle* handle, const char* name)
+{
+	if (strcmp(handle->name, name))
+	{
+		return false;
+	}
+	if (!squirrelhandles.Defined(handle->name) || !squirrelhandles.Defined(name))
+	{
+		return false;
+	}
+	if (!&squirrelhandles[handle->name]->operator[](handle->id))
+	{
+		return false;
+	}
+	return true;
+}
+
 #if defined( REPLAY_ENABLED )
 IReplayManager *g_pReplayManager = NULL;
 IReplayMovieManager *g_pReplayMovieManager = NULL;
@@ -1111,14 +1154,14 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 #ifndef _X360
 	HookHapticMessages(); // Always hook the messages
 #endif
-	/*
-	CSysModule* pLuaDLL = g_pFullFileSystem->LoadModule("lua", "GAMEBIN", false);
-	if (pLuaDLL != nullptr)
+	
+	CSysModule* pSquirrelDLL = g_pFullFileSystem->LoadModule("squirrel", "GAMEBIN", false);
+	if (pSquirrelDLL != nullptr)
 	{
-		CreateInterfaceFn luaFactory = Sys_GetFactory(pLuaDLL);
-		if (luaFactory != nullptr)
+		CreateInterfaceFn squirrelFactory = Sys_GetFactory(pSquirrelDLL);
+		if (squirrelFactory != nullptr)
 		{
-			g_pLua = (ILua*)luaFactory(INTERFACELUA_VERSION, NULL);
+			g_pSquirrel = (ISquirrel*)squirrelFactory(INTERFACESQUIRREL_VERSION, NULL);
 		}
 		else
 		{
@@ -1129,7 +1172,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	{
 		return false;
 	}
-	*/
+	
 	return true;
 }
 
@@ -1282,6 +1325,8 @@ int CHLClient::HudVidInit( void )
 	gHUD.VidInit();
 
 	GetClientVoiceMgr()->VidInit();
+
+	
 
 	return 1;
 }
@@ -1644,6 +1689,83 @@ int Squirrel_ExecuteConsoleCommand(SquirrelScript script)
 	return 0;
 }
 
+int Squirrel_VGUICreatePanel(SquirrelScript script)
+{
+	vgui::Panel* viewport = g_pClientMode->GetViewport();
+	SquirrelHandle* hand = NewSquirrelHandle("VGUI", 0);
+	vgui::SquirrelPanel* panel = new vgui::SquirrelPanel(script,hand);
+	hand->ptr = panel;
+	panel->SetParent(viewport);
+	panel->SetPaintBackgroundEnabled(true);
+	panel->SetPaintBackgroundType(2);
+	panel->SetAlpha(255);
+	SquirrelValue ret;
+	ret.type = SQUIRREL_USERDATA;
+	ret.val_userdata = hand;
+	g_pSquirrel->PushValue(script, ret);
+	return 1;
+}
+
+int Squirrel_VGUISetBounds(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	int x, y, w, t;
+	if (!g_pSquirrel->GetArgs(script, "uiiii", &hand,&x,&y,&w,&t))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetBounds(x, y, w, t);
+	return 0;
+}
+
+int Squirrel_VGUISetParent(SquirrelScript script)
+{
+	SquirrelHandle* hand, *parent;
+	if (!g_pSquirrel->GetArgs(script, "uu", &hand, &parent))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI") || !CheckSquirrelHandle(parent, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetParent((vgui::SquirrelPanel*)(parent->ptr));
+	return 0;
+}
+
+int Squirrel_VGUISetPaintFunction(SquirrelScript script)
+{
+	SquirrelHandle* hand;
+	const char* func;
+	if (!g_pSquirrel->GetArgs(script, "us", &hand, &func))
+	{
+		return 0;
+	}
+	if (!CheckSquirrelHandle(hand, "VGUI"))
+	{
+		return 0;
+	}
+	((vgui::SquirrelPanel*)hand->ptr)->SetPaintFunction(func);
+	return 0;
+}
+
+int Squirrel_SurfaceDrawLine(SquirrelScript script)
+{
+	int x1, y1, x2, y2;
+	if (!g_pSquirrel->GetArgs(script, "iiii", &x1, &y1,&x2,&y2))
+	{
+		return 0;
+	}
+	vgui::surface()->DrawSetColor(255, 255, 0, 255);
+	vgui::surface()->DrawLine(x1, y1, x2, y2);
+	return 0;
+}
+
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -1664,6 +1786,11 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "ExecuteConsoleCommand", Squirrel_ExecuteConsoleCommand);
 		g_pSquirrel->AddFunction(script, "GetConvar", Squirrel_GetConvar);
 		g_pSquirrel->AddFunction(script, "PrintToClient", Squirrel_PrintToClient);
+		g_pSquirrel->AddFunction(script, "VGUICreatePanel", Squirrel_VGUICreatePanel);
+		g_pSquirrel->AddFunction(script, "VGUISetBounds", Squirrel_VGUISetBounds);
+		g_pSquirrel->AddFunction(script, "VGUISetParent", Squirrel_VGUISetParent);
+		g_pSquirrel->AddFunction(script, "VGUISetPaintFunction", Squirrel_VGUISetPaintFunction);
+		g_pSquirrel->AddFunction(script, "SurfaceDrawLine", Squirrel_SurfaceDrawLine);
 
 
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
@@ -1824,6 +1951,10 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		pszFileName = g_pFullFileSystem->FindNext(findHandle);
 	}
 	
+	for (int i = 0; i < squirrelscripts.Count(); i++)
+	{
+		g_pSquirrel->CallFunction(squirrelscripts[i], "LevelInitPreEntity", "");
+	}
 }
 
 

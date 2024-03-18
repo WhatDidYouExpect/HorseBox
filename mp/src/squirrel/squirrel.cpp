@@ -72,6 +72,9 @@ SquirrelValue CSquirrel::CallFunction(SquirrelScript script, const char* fun, co
 		case 'f':
 			sq_pushfloat(v, (float)(va_arg(args, double)));
 			break;
+		case 'u':
+			sq_pushuserpointer(v, va_arg(args, SquirrelHandle*));
+			break;
 		default:
 			sq_pushnull(v);
 			break;
@@ -104,6 +107,11 @@ SquirrelValue CSquirrel::CallFunction(SquirrelScript script, const char* fun, co
 		SQBool p;
 		sq_getbool(v, -1, &p);
 		ret.val_bool = p;
+	}
+	else if (type == OT_USERDATA)
+	{
+		ret.type = SQUIRREL_USERDATA;
+		sq_getuserpointer(v, -1, (void**)&ret.val_userdata);
 	}
 	sq_pop(v, 2);
 	return ret;
@@ -187,6 +195,17 @@ bool CSquirrel::GetArgs(SquirrelScript script, const char* types, ...)
 				return false;
 			}
 			break;
+		case 'u':
+			if (type == OT_USERPOINTER)
+			{
+				sq_getuserpointer(v, i + 1, (void**)(va_arg(args, SquirrelHandle**)));
+			}
+			else
+			{
+				va_end(args);
+				return false;
+			}
+			break;
 		default:
 			va_end(args);
 			return false;
@@ -211,6 +230,9 @@ void CSquirrel::PushValue(SquirrelScript script, SquirrelValue val)
 		break;
 	case SQUIRREL_FLOAT:
 		sq_pushfloat(v, val.val_float);
+		break;
+	case SQUIRREL_USERDATA:
+		sq_pushuserpointer(v, val.val_userdata);
 		break;
 	default:
 		sq_pushnull(v);
