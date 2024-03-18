@@ -51,11 +51,11 @@ SquirrelValue CSquirrel::CallFunction(SquirrelScript script, const char* fun, co
 		return ret;
 	}
 	sq_pushroottable(v);
+	int count = strlen(types);
 	
 	va_list args;
 	va_start(args, types);
 	
-	int count = strlen(types);
 	for (int i = 0; i < count; i++)
 	{
 		switch (types[i])
@@ -70,7 +70,7 @@ SquirrelValue CSquirrel::CallFunction(SquirrelScript script, const char* fun, co
 			sq_pushstring(v, va_arg(args, const char*),-1);
 			break;
 		case 'f':
-			sq_pushfloat(v, va_arg(args, float));
+			sq_pushfloat(v, (float)(va_arg(args, double)));
 			break;
 		default:
 			sq_pushnull(v);

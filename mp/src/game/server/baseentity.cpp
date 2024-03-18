@@ -1506,11 +1506,16 @@ int CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 
 		// Scale the damage by my own modifiers
 		info.ScaleDamage( GetReceivedDamageScale( info.GetAttacker() ) );
+		for (int i = 0; i < squirrelscripts.Count(); i++)
+		{
+			SquirrelValue newdmg = g_pSquirrel->CallFunction(squirrelscripts[i], "OnTakeDamage", "ifiii", entindex(), info.GetDamage(), info.GetAttacker() ? info.GetAttacker()->entindex() : -1, info.GetWeapon() ? info.GetWeapon()->entindex() : -1, info.GetDamageType());
+			if (newdmg.type != SQUIRREL_FLOAT)
+			{
+				continue;
+			}
+			info.SetDamage(newdmg.val_float);
 
-		//for (int i = 0; i < squirrelscripts.Count(); i++)
-		//{
-		//	g_pSquirrel->CallFunction(squirrelscripts[i], "OnTakeDamage", "ifiii", entindex(), info.GetDamage(), info.GetAttacker() ? info.GetAttacker()->entindex() : -1, info.GetWeapon() ? info.GetWeapon()->entindex() : -1, info.GetDamageType());
-		//}
+		}
 
 		//Msg("%s took %.2f Damage, at %.2f\n", GetClassname(), info.GetDamage(), gpGlobals->curtime );
 
@@ -1649,6 +1654,11 @@ void CBaseEntity::Event_Killed( const CTakeDamageInfo &info )
 	{
 		info.GetAttacker()->Event_KilledOther(this, info);
 	}
+	for (int i = 0; i < squirrelscripts.Count(); i++)
+	{
+		g_pSquirrel->CallFunction(squirrelscripts[i], "OnEntityKilled", "ifiii", entindex(), info.GetDamage(), info.GetAttacker() ? info.GetAttacker()->entindex() : -1, info.GetWeapon() ? info.GetWeapon()->entindex() : -1, info.GetDamageType());
+	}
+
 
 	m_takedamage = DAMAGE_NO;
 	m_lifeState = LIFE_DEAD;

@@ -1359,6 +1359,138 @@ int Squirrel_EntitySetParent(SquirrelScript script)
 	return 0;
 }
 
+
+int Squirrel_EntitySetHealth(SquirrelScript script)
+{
+	int id, health;
+	if (!g_pSquirrel->GetArgs(script, "ii", &id, &health))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	ent->SetHealth(health);
+	return 0;
+}
+
+int Squirrel_EntitySetMaxHealth(SquirrelScript script)
+{
+	int id, health;
+	if (!g_pSquirrel->GetArgs(script, "ii", &id, &health))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	ent->SetMaxHealth(health);
+	return 0;
+}
+
+
+int Squirrel_ClientSetMaxSpeed(SquirrelScript script)
+{
+	int id;
+	float speed;
+	if (!g_pSquirrel->GetArgs(script, "if", &id, &speed))
+	{
+		return 0;
+	}
+	CBasePlayer* ent = UTIL_PlayerByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	ent->SetMaxSpeed(speed);
+	return 0;
+}
+
+int Squirrel_ClientGetHeldWeapon(SquirrelScript script)
+{
+	int id;
+	if (!g_pSquirrel->GetArgs(script, "i", &id))
+	{
+		return 0;
+	}
+	CBasePlayer* ent = UTIL_PlayerByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	CBaseCombatWeapon* wpn = ent->GetActiveWeapon();
+	if (!wpn)
+	{
+		return 0;
+	}
+	SquirrelValue val;
+	val.type = SQUIRREL_INT;
+	val.val_int = wpn->entindex();
+	g_pSquirrel->PushValue(script,val);
+	return 1;
+}
+
+int Squirrel_EntityGetClassname(SquirrelScript script)
+{
+	int id;
+	if (!g_pSquirrel->GetArgs(script, "i", &id))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	SquirrelValue val;
+	val.type = SQUIRREL_STRING;
+	val.val_string = ent->GetClassname();
+	g_pSquirrel->PushValue(script, val);
+	return 1;
+}
+int Squirrel_EntityGetHealth(SquirrelScript script)
+{
+	int id;
+	if (!g_pSquirrel->GetArgs(script, "i", &id))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	SquirrelValue val;
+	val.type = SQUIRREL_INT;
+	val.val_int = ent->GetHealth();
+	g_pSquirrel->PushValue(script, val);
+	return 1;
+}
+int Squirrel_EntityGetMaxHealth(SquirrelScript script)
+{
+	int id;
+	if (!g_pSquirrel->GetArgs(script, "i", &id))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	if (!ent)
+	{
+		return 0;
+	}
+	SquirrelValue val;
+	val.type = SQUIRREL_INT;
+	val.val_int = ent->GetMaxHealth();
+	g_pSquirrel->PushValue(script, val);
+	return 1;
+}
+
+
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -1402,6 +1534,13 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "EntityFireInputString", Squirrel_EntityFireInputString);
 		g_pSquirrel->AddFunction(script, "FindEntityByName", Squirrel_FindEntityByName);
 		g_pSquirrel->AddFunction(script, "EntitySetParent", Squirrel_EntitySetParent);
+		g_pSquirrel->AddFunction(script, "EntitySetHealth", Squirrel_EntitySetHealth);
+		g_pSquirrel->AddFunction(script, "EntitySetMaxHealth", Squirrel_EntitySetMaxHealth);
+		g_pSquirrel->AddFunction(script, "ClientSetMaxSpeed", Squirrel_ClientSetMaxSpeed);
+		g_pSquirrel->AddFunction(script, "ClientGetHeldWeapon", Squirrel_ClientGetHeldWeapon);
+		g_pSquirrel->AddFunction(script, "EntityGetClassname", Squirrel_EntityGetClassname);
+		g_pSquirrel->AddFunction(script, "EntityGetHealth", Squirrel_EntityGetHealth);
+		g_pSquirrel->AddFunction(script, "EntityGetMaxHealth", Squirrel_EntityGetMaxHealth);
 
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)

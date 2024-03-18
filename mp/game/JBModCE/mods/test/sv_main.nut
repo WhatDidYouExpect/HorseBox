@@ -27,7 +27,31 @@ function OnClientSpawned(client)
 	//EntityFireInputBool(ent,"ForceSpawn",-1,-1,true);
 }
 
-function OnTakeDamage(client, damage, attacker, weapon, type)
+function OnEntityKilled(ent, damage, attacker, weapon, type)
 {
-	PrintToServer(client.tostring()+" received "+damage.tostring()+" damage.\n");
+	if(EntityGetClassname(ent) == "npc_citizen" && attacker != -1)
+	{
+		local atkcls = EntityGetClassname(attacker);
+		local zombie = 0;
+		if(atkcls == "npc_zombie" || atkcls == "npc_zombie_torso" || atkcls == "npc_headcrab")
+		{
+			zombie = CreateEntity("npc_zombie")
+		}
+		else if(atkcls == "npc_poisonzombie" || atkcls == "npc_headcrab_poison" || atkcls == "npc_headcrab_black")
+		{
+			zombie = CreateEntity("npc_poisonzombie")
+		}
+		else if(atkcls == "npc_headcrab_fast" || atkcls == "npc_fastzombie")
+		{
+			zombie = CreateEntity("npc_fastzombie")
+		}
+		if(zombie == 0)
+		{
+			return;
+		}
+		local pos = EntityGetPosition(ent);
+		EntitySetPosition(zombie,pos[0],pos[1],pos[2]);
+		SpawnEntity(zombie);
+
+	}
 }

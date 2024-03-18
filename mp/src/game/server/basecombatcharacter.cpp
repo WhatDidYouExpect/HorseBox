@@ -2375,6 +2375,9 @@ GLOBALS ASSUMED SET:  g_iSkillLevel
 */
 
 
+#include "squirrel/squirrel.h"
+extern ISquirrel* g_pSquirrel;
+extern CUtlVector<SquirrelScript> squirrelscripts;
 
 int CBaseCombatCharacter::OnTakeDamage( const CTakeDamageInfo &info )
 {
@@ -2432,6 +2435,11 @@ int CBaseCombatCharacter::OnTakeDamage( const CTakeDamageInfo &info )
 			}
 			
 			bool bGibbed = false;
+
+			for (int i = 0; i < squirrelscripts.Count(); i++)
+			{
+				g_pSquirrel->CallFunction(squirrelscripts[i], "OnEntityKilled", "ifiii", entindex(), info.GetDamage(), info.GetAttacker() ? info.GetAttacker()->entindex() : -1, info.GetWeapon() ? info.GetWeapon()->entindex() : -1, info.GetDamageType());
+			}
 
 			Event_Killed( info );
 
