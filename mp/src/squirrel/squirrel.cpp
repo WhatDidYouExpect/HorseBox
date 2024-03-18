@@ -56,7 +56,7 @@ SquirrelValue CSquirrel::CallFunction(SquirrelScript script, const char* fun, co
 	va_start(args, types);
 	
 	int count = strlen(types);
-	for (int i = 0; i < count; ++i)
+	for (int i = 0; i < count; i++)
 	{
 		switch (types[i])
 		{

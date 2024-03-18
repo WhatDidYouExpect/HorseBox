@@ -52,6 +52,11 @@ void PatchSearchPath(KeyValues* keyv, const char* find, const char* basepath)
 KeyValues* GetKeyvaluesFromFile(const char* dir, const char* name)
 {
 	FILE* fp = fopen(dir, "r");
+	if (!fp)
+	{
+		MessageBox(0, dir, name, MB_OK);
+		return 0;
+	}
 	fseek(fp, 0L, SEEK_END);
 	int sz = ftell(fp);
 	char* fileRead = (char*)malloc(sz+1);

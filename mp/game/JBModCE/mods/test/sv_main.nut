@@ -17,4 +17,17 @@ function OnClientSpawned(client)
 	PrintToServer(client.tostring()+"\n")
 	SendKeyHintToClient(client,"BRUBURBURU");
 	GiveNamedItem(client,"weapon_ar2",0);
+	local ent = FindEntityByName("SEObspwn1",-1,-1);
+	if(ent == null)
+	{
+		PrintToServer("Couldnt find ent\n");
+		return;
+	}
+	PrintToServer("theent: "+ent.tostring()+"\n");
+	//EntityFireInputBool(ent,"ForceSpawn",-1,-1,true);
+}
+
+function OnTakeDamage(client, damage, attacker, weapon, type)
+{
+	PrintToServer(client.tostring()+" received "+damage.tostring()+" damage.\n");
 }

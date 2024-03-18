@@ -1275,6 +1275,7 @@ void CWeaponGravityGun::PrimaryAttack( void )
 
 void CWeaponGravityGun::SecondaryAttack( void )
 {
+	
 	m_flNextSecondaryAttack = gpGlobals->curtime + 0.1;
 	if ( m_active )
 	{
@@ -1282,7 +1283,7 @@ void CWeaponGravityGun::SecondaryAttack( void )
 		SoundDestroy();
 		return;
 	}
-
+	return;
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 	Assert( pOwner );
 

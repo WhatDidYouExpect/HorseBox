@@ -2373,12 +2373,17 @@ When a NPC is poisoned via an arrow etc it takes all the poison damage at once.
 GLOBALS ASSUMED SET:  g_iSkillLevel
 ============
 */
+
+
+
 int CBaseCombatCharacter::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	int retVal = 0;
 
 	if (!m_takedamage)
 		return 0;
+
+	
 
 	m_iDamageCount++;
 

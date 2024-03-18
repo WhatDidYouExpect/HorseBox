@@ -1343,6 +1343,22 @@ int Squirrel_EntityFireInputString(SquirrelScript script)
 	return 0;
 }
 
+int Squirrel_EntitySetParent(SquirrelScript script)
+{
+	int child, parent, attachment;
+	if (!g_pSquirrel->GetArgs(script, "iii", &child, &parent,&attachment))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(child);
+	if (!ent)
+	{
+		return 0;
+	}
+	ent->SetParent(UTIL_EntityByIndex(parent), attachment);
+	return 0;
+}
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -1385,6 +1401,7 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "EntityFireInputInt", Squirrel_EntityFireInputInt);
 		g_pSquirrel->AddFunction(script, "EntityFireInputString", Squirrel_EntityFireInputString);
 		g_pSquirrel->AddFunction(script, "FindEntityByName", Squirrel_FindEntityByName);
+		g_pSquirrel->AddFunction(script, "EntitySetParent", Squirrel_EntitySetParent);
 
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)

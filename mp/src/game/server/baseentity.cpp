@@ -1441,10 +1441,16 @@ int CBaseEntity::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose: Scale damage done and call OnTakeDamage
 //-----------------------------------------------------------------------------
+
+#include "squirrel/squirrel.h"
+extern ISquirrel* g_pSquirrel;
+extern CUtlVector<SquirrelScript> squirrelscripts;
 int CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 {
 	if ( !g_pGameRules )
 		return 0;
+
+	
 
 	bool bHasPhysicsForceDamage = !g_pGameRules->Damage_NoPhysicsForce( inputInfo.GetDamageType() );
 	if ( bHasPhysicsForceDamage && inputInfo.GetDamageType() != DMG_GENERIC )
@@ -1500,6 +1506,11 @@ int CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 
 		// Scale the damage by my own modifiers
 		info.ScaleDamage( GetReceivedDamageScale( info.GetAttacker() ) );
+
+		//for (int i = 0; i < squirrelscripts.Count(); i++)
+		//{
+		//	g_pSquirrel->CallFunction(squirrelscripts[i], "OnTakeDamage", "ifiii", entindex(), info.GetDamage(), info.GetAttacker() ? info.GetAttacker()->entindex() : -1, info.GetWeapon() ? info.GetWeapon()->entindex() : -1, info.GetDamageType());
+		//}
 
 		//Msg("%s took %.2f Damage, at %.2f\n", GetClassname(), info.GetDamage(), gpGlobals->curtime );
 
