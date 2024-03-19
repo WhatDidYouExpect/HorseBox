@@ -213,11 +213,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	{
 		MessageBox(0, "Install Source SDK 2013 Base Multiplayer to play this.", "Launcher error", MB_OK);
 	}
-	char gameParam[MAX_PATH];
-	snprintf(gameParam, MAX_PATH, " -insecure -game sourcetest -windowed -steam -game \"");
-	strncat(gameParam, g_szBasedir, MAX_PATH);
-	V_AppendSlash(gameParam, MAX_PATH);
-	strncat(gameParam, "jbmodce\"", MAX_PATH);
+	char gameParam[1024];
+	strncpy(gameParam, "-steam -game \"", 1024);
+	strncat(gameParam, g_szBasedir, 1024);
+	V_AppendSlash(gameParam, 1024);
+	strncat(gameParam, "jbmodce\" ", 1024);
+	strncat(gameParam, lpCmdLine, 1024);
 
 	ShellExecute(0, "open", sdk2013dir, gameParam, steamDir, SW_SHOWDEFAULT);
 	return 0;

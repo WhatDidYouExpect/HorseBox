@@ -27,16 +27,7 @@ function DrawSpawnButton(button)
 
 
 
-paths <- ["models/props_c17/oildrum001_explosive.mdl",
-"models/props_junk/plasticcrate01a.mdl",
-"models/props_junk/wood_crate001a.mdl",
-"models/alyx.mdl",
-"models/barney.mdl",
-"models/props_c17/oildrum001.mdl",
-"models/props_junk/popcan01a.mdl",
-"models/props_junk/watermelon01.mdl",
-"models/headcrabclassic.mdl",
-"models/props_c17/playground_carousel01.mdl"];
+paths <- [];
 
 
 function ButtonClicked(button, code)
@@ -58,6 +49,8 @@ function CreateSpawnButton(parent,x,y,i)
 
 function LevelInitPreEntity()
 {
+	paths = GetModelList();
+	PrintToClient(paths[11]+"\n");
 	ExecuteConsoleCommand("setinfo spawnmenu_enable 0");
 	ExecuteConsoleCommand("setinfo spawnmenu_disable 0");
 	local th = VGUICreatePanel("");

@@ -2028,6 +2028,67 @@ int Squirrel_VGUIGetUserdata(SquirrelScript script)
 	return 1;
 }
 
+void Squirrel_GetModelListRecur(SquirrelScript script, FileFindHandle_t findHandle, const char* searchPath)
+{
+	SquirrelValue ret;
+	ret.type = SQUIRREL_STRING;
+	const char* pszFileName = g_pFullFileSystem->FindNext(findHandle);
+	while (pszFileName)
+	{
+		if (pszFileName[0] == '.')
+		{
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		if (g_pFullFileSystem->FindIsDirectory(findHandle))
+		{
+			char newPath[MAX_PATH];
+			V_strncpy(newPath, searchPath,MAX_PATH);
+			V_AppendSlash(newPath, MAX_PATH);
+			V_strncat(newPath, pszFileName,MAX_PATH);
+			char newPathSearch[MAX_PATH];
+			V_strncpy(newPathSearch, newPath, MAX_PATH);
+			V_AppendSlash(newPathSearch, MAX_PATH);
+			V_strncat(newPathSearch, "*.mdl", MAX_PATH);
+			FileFindHandle_t newhandle;
+			pszFileName = g_pFullFileSystem->FindFirst(newPathSearch, &newhandle);
+			Squirrel_GetModelListRecur(script, newhandle, newPath);
+			g_pFullFileSystem->FindClose(newhandle);
+			continue;
+		}
+		char pFilePath[MAX_PATH];
+		V_strncpy(pFilePath, searchPath,MAX_PATH);
+		V_AppendSlash(pFilePath, MAX_PATH);
+		strncat(pFilePath, pszFileName, MAX_PATH);
+		ret.val_string = pFilePath;
+		g_pSquirrel->PushValue(script, ret);
+		g_pSquirrel->AppendToArray(script);
+		pszFileName = g_pFullFileSystem->FindNext(findHandle);
+	}
+}
+
+int Squirrel_GetModelList(SquirrelScript script)
+{
+
+	g_pSquirrel->PushArray(script);
+	FileFindHandle_t newhandle;
+	const char* pszFileName = g_pFullFileSystem->FindFirst("models/*.mdl", &newhandle);
+	if (pszFileName)
+	{
+		SquirrelValue ret;
+		ret.type = SQUIRREL_STRING;
+		char pFilePath[MAX_PATH];
+		V_strncpy(pFilePath, "models/", MAX_PATH);
+		strncat(pFilePath, pszFileName, MAX_PATH);
+		ret.val_string = pFilePath;
+		g_pSquirrel->PushValue(script, ret);
+		g_pSquirrel->AppendToArray(script);
+		Squirrel_GetModelListRecur(script, newhandle, "models");
+	}
+	
+	return 1;
+}
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -2070,6 +2131,7 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "VGUISetVisible", Squirrel_VGUISetVisible);
 		g_pSquirrel->AddFunction(script, "VGUISetPosition", Squirrel_VGUISetPosition);
 		g_pSquirrel->AddFunction(script, "VGUIGetUserdata", Squirrel_VGUIGetUserdata);
+		g_pSquirrel->AddFunction(script, "GetModelList", Squirrel_GetModelList);
 
 
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
@@ -2128,6 +2190,7 @@ void LoadFilesInDirectory(const char* modname, const char* folder, const char* f
 		}
 		pszFileName = g_pFullFileSystem->FindNext(findHandle);
 	}
+	g_pFullFileSystem->FindClose(findHandle);
 }
 
 

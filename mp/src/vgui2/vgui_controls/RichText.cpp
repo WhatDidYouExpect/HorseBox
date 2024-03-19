@@ -183,6 +183,8 @@ RichText::RichText(Panel *parent, const char *panelName) : BaseClass(parent, pan
 		
 		_drawOffsetX = static_cast<int>( static_cast<float>( DRAW_OFFSET_X )*( static_cast<float>( sw )/ static_cast<float>( width )));
 		_drawOffsetY = static_cast<int>( static_cast<float>( DRAW_OFFSET_Y )*( static_cast<float>( sw )/ static_cast<float>( width )));
+		_drawOffsetY = max(1, _drawOffsetY);
+		_drawOffsetX = max(1, _drawOffsetX);
 	}
 	else
 	{
@@ -1474,7 +1476,7 @@ void RichText::LayoutVerticalScrollBarSlider()
 	_vertScrollBar->SetSize( _vertScrollBar->GetWide(), tall );
 	
 	// calculate how many lines we can fully display
-	int displayLines = tall / (GetLineHeight() + _drawOffsetY);
+	int displayLines = tall / max(1,(GetLineHeight() + _drawOffsetY));
 	int numLines = m_LineBreaks.Count();
 	
 	if (numLines <= displayLines)

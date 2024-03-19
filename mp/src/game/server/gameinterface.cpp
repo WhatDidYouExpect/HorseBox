@@ -1216,6 +1216,29 @@ int Squirrel_FindEntityByName(SquirrelScript script)
 	return 1;
 }
 
+int Squirrel_FindAllEntitiesByName(SquirrelScript script)
+{
+	const char* name;
+	int firstent, searchingent;
+	if (!g_pSquirrel->GetArgs(script, "sii", &name, &firstent, &searchingent))
+	{
+		return 0;
+	}
+	g_pSquirrel->PushArray(script);
+	CBaseEntity* ent = UTIL_EntityByIndex(firstent);
+	SquirrelValue ret;
+	ret.type = SQUIRREL_INT;
+	
+	while (ent = gEntList.FindEntityByName(ent, name, UTIL_EntityByIndex(searchingent)))
+	{
+		ret.val_int = ent->entindex();
+		g_pSquirrel->PushValue(script, ret);
+		g_pSquirrel->AppendToArray(script);
+	}
+	
+	return 1;
+}
+
 int Squirrel_EntityRemove(SquirrelScript script)
 {
 	int id;
@@ -1490,6 +1513,20 @@ int Squirrel_EntityGetMaxHealth(SquirrelScript script)
 	return 1;
 }
 
+int Squirrel_IsValidEntity(SquirrelScript script)
+{
+	int id;
+	if (!g_pSquirrel->GetArgs(script, "i", &id))
+	{
+		return 0;
+	}
+	CBaseEntity* ent = UTIL_EntityByIndex(id);
+	SquirrelValue val;
+	val.type = SQUIRREL_BOOL;
+	val.val_bool = ent != 0;
+	g_pSquirrel->PushValue(script, val);
+	return 1;
+}
 
 
 void LoadMod(const char* path)
@@ -1542,6 +1579,8 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "EntityGetClassname", Squirrel_EntityGetClassname);
 		g_pSquirrel->AddFunction(script, "EntityGetHealth", Squirrel_EntityGetHealth);
 		g_pSquirrel->AddFunction(script, "EntityGetMaxHealth", Squirrel_EntityGetMaxHealth);
+		g_pSquirrel->AddFunction(script, "IsValidEntity", Squirrel_IsValidEntity);
+		g_pSquirrel->AddFunction(script, "FindAllEntitiesByName", Squirrel_FindAllEntitiesByName);
 
 		SquirrelValue returned = g_pSquirrel->CallFunction(script, "OnModStart", "");
 		switch (returned.type)
