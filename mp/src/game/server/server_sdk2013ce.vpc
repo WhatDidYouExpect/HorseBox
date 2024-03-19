@@ -304,6 +304,7 @@ $Project "Server"
 		$Folder "JBMod"
 		{
 			$File	"$SRCDIR\game\server\physgun.cpp"
+			$File	"$SRCDIR\game\server\vehicle_jeep.cpp"
 		}
 	}
 }

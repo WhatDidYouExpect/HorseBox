@@ -32,7 +32,7 @@ bool DesiredApp(int appid)
 void PatchSearchPath(KeyValues* keyv, const char* find, const char* basepath)
 {
 	char replace[MAX_PATH];
-	strcpy(replace, basepath);
+	strncpy(replace, basepath,MAX_PATH);
 	strncat(replace, find, MAX_PATH);
 	int findlen = strlen(find);
 	for (KeyValues* value = keyv->GetFirstValue(); value; value = value->GetNextValue())
@@ -59,15 +59,15 @@ KeyValues* GetKeyvaluesFromFile(const char* dir, const char* name)
 	}
 	fseek(fp, 0L, SEEK_END);
 	int sz = ftell(fp);
-	char* fileRead = (char*)malloc(sz+1);
-	memset(fileRead, 0, sz);
+	char* fileRead = (char*)g_pMemAlloc->Alloc(sz+2);
+	memset(fileRead, 0, sz+1);
 	rewind(fp);
 	fread((void*)fileRead, 1, sz, fp);
 	fileRead[sz] = '\x00';
 	KeyValues* keyv = new KeyValues(name);
 	keyv->LoadFromBuffer(name, fileRead);
 	fclose(fp);
-	free(fileRead);
+	g_pMemAlloc->Free(fileRead);
 	return keyv;
 }
 
@@ -104,6 +104,7 @@ void GetAppManifest(const char* appid, const char* path)
 	strncat(gameinfoDir, "gameinfo.txt", MAX_PATH);
 	KeyValues* gameinfo = GetKeyvaluesFromFile(gameinfoDir, "GameInfo");
 	KeyValues* searchpaths = gameinfo->FindKey("FileSystem", true)->FindKey("SearchPaths", true);
+	
 	switch (Q_atoi(appid))
 	{
 	case 220: //hl2
@@ -143,6 +144,7 @@ void GetAppManifest(const char* appid, const char* path)
 		MessageBox(NULL, stupidwarning, "YOU BUFFOON", MB_OK | MB_ICONEXCLAMATION);
 		break;
 	}
+	
 	appmanifest->deleteThis();
 	CUtlBuffer buf(0, 0, 0);
 	gameinfo->RecursiveSaveToFile(buf, 0);
@@ -186,7 +188,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	RegGetValue(HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Valve\\Steam", "InstallPath", RRF_RT_REG_SZ, NULL, (PVOID)&steamDir, &BufferSize);
 	if (!steamDir)
 		return 1;
-	strcpy(steamLibraryFolders,steamDir);
+	strncpy(steamLibraryFolders,steamDir,MAX_PATH);
 	strncat(steamLibraryFolders, "\\steamapps\\libraryfolders.vdf", MAX_PATH);
 	KeyValues* libraryfolders = GetKeyvaluesFromFile(steamLibraryFolders, "libraryfolders");
 	char sdk2013dir[MAX_PATH] = "";
