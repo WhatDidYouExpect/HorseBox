@@ -32,7 +32,7 @@
 
 
 // Half-Life Server Configuration Layout Script (stores last settings chosen, too)
-// File generated:  Thu Mar 14 12:50:11 AM
+// File generated:  Tue Mar 19 08:54:00 PM
 //
 //
 // Cvar	-	Setting
@@ -48,13 +48,6 @@ DESCRIPTION SERVER_OPTIONS
 		{ "JBMod:CE" }
 	}
 
-	"sv_password"
-	{
-		"#Valve_Server_Password"
-		{ STRING }
-		{ "" }
-	}
-
 	"maxplayers"
 	{
 		"#Valve_Max_Players"
@@ -62,11 +55,121 @@ DESCRIPTION SERVER_OPTIONS
 		{ "32" }
 	}
 
+	"sv_password"
+	{
+		"#Valve_Server_Password"
+		{ STRING }
+		{ "" }
+	}
+
 	"mp_timelimit"
 	{
-		"#Valve_Time_Limit"
+		"#Cstrike_Timelimit"
 		{ NUMBER 0 -1 }
 		{ "0" }
+	}
+
+	"mp_winlimit"
+	{
+		"#Cstrike_WinLimit"
+		{ NUMBER 0 -1 }
+		{ "0" }
+	}
+
+	"mp_maxrounds"
+	{
+		"#Cstrike_RoundLimit"
+		{ NUMBER 0 -1 }
+		{ "0" }
+	}
+
+	"mp_roundtime"
+	{
+		"#Cstrike_RoundTime"
+		{ NUMBER 0 15 }
+		{ "5" }
+	}
+
+	"mp_freezetime"
+	{
+		"#Cstrike_FreezeTime"
+		{ NUMBER 0 60 }
+		{ "6" }
+	}
+
+	"mp_buytime"
+	{
+		"#Cstrike_BuyTime"
+		{ NUMBER 0.25 -1 }
+		{ "1.5" }
+	}
+
+	"mp_startmoney"
+	{
+		"#Cstrike_StartMoney"
+		{ NUMBER 800 16000 }
+		{ "800" }
+	}
+
+	"mp_footsteps"
+	{
+		"#Valve_Footsteps"
+		{ BOOL }
+		{ "1" }
+	}
+
+	"mp_forcecamera"
+	{
+		"#Cstrike_Death_Camera_Type"
+		{
+			LIST
+			"#Cstrike_Spectate_Anyone" "0"
+			"#Cstrike_Spectate_Team_Only" "1"
+			"#Cstrike_Only_First_Person" "2"
+		}
+		{ "0" }
+	}
+
+	"mp_fadetoblack"
+	{
+		"#Cstrike_Fade_To_Black"
+		{ BOOL }
+		{ "0" }
+	}
+
+	"mp_friendlyfire"
+	{
+		"#Valve_Friendly_Fire"
+		{ BOOL }
+		{ "0" }
+	}
+
+	"mp_tkpunish"
+	{
+		"#Cstrike_TK_Punish"
+		{ BOOL }
+		{ "1" }
+	}
+
+	"mp_autokick"
+	{
+		"#Cstrike_AutoKick"
+		{ BOOL }
+		{ "0" }
+	}
+
+	"mp_hostagepenalty"
+	{
+		"#Cstrike_Hostage_Penalty"
+		{ NUMBER 0 -1 }
+		{ "5" }
+	}
+
+	"mp_flashlight"
+	{
+		"#Cstrike_Allow_Flashlight"
+		{ BOOL }
+		{ "1" }
 	}
 
 	"mp_fraglimit"
@@ -102,20 +205,6 @@ DESCRIPTION SERVER_OPTIONS
 		"#Valve_Weapons_Stay"
 		{ BOOL }
 		{ "0" }
-	}
-
-	"mp_footsteps"
-	{
-		"#Valve_Footsteps"
-		{ BOOL }
-		{ "1" }
-	}
-
-	"mp_flashlight"
-	{
-		"#Valve_Flashlight"
-		{ BOOL }
-		{ "1" }
 	}
 
 	"mp_forcerespawn"
