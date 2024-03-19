@@ -3967,7 +3967,7 @@ float CServerGameClients::ProcessUsercmds( edict_t *player, bf_read *buf, int nu
 	{
 		for (int i = 0; i < squirrelscripts.Count(); i++)
 		{
-			g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientSpawned", "i",pPlayer->entindex());
+			g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientFirstSpawned", "i",pPlayer->entindex());
 		}
 		pPlayer->m_bHasSpawned = true;
 	}

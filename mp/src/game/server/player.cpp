@@ -4903,6 +4903,9 @@ void CBasePlayer::InitialSpawn( void )
 	gamestats->Event_PlayerConnected( this );
 }
 
+#include "squirrel/squirrel.h"
+extern ISquirrel* g_pSquirrel;
+extern CUtlVector<SquirrelScript> squirrelscripts;
 //-----------------------------------------------------------------------------
 // Purpose: Called everytime the player respawns
 //-----------------------------------------------------------------------------
@@ -5066,6 +5069,10 @@ void CBasePlayer::Spawn( void )
 	UpdateLastKnownArea();
 
 	m_weaponFiredTimer.Invalidate();
+	for (int i = 0; i < squirrelscripts.Count(); i++)
+	{
+		g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientSpawned", "i", entindex());
+	}
 }
 
 void CBasePlayer::Activate( void )
