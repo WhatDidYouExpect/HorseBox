@@ -910,7 +910,7 @@ void CPropJeep::FireCannon(void)
 	HapticPunch(m_hPlayer, 0, 0, hap_jeep_cannon_mag.GetFloat());
 #endif
 	FireBulletsInfo_t info(1, m_vecGunOrigin, aimDir, VECTOR_CONE_1DEGREES, MAX_TRACE_LENGTH, m_nAmmoType);
-
+	info.m_pWeapon = this;
 	info.m_nFlags = FIRE_BULLETS_ALLOW_WATER_SURFACE_IMPACTS;
 	info.m_pAttacker = m_hPlayer;
 

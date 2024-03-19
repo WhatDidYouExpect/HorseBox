@@ -681,6 +681,7 @@ struct FireBulletsInfo_t
 		m_flDamage = 0;
 		m_iPlayerDamage = 0;
 		m_pAttacker = NULL;
+		m_pWeapon = NULL;
 		m_nFlags = 0;
 		m_pAdditionalIgnoreEnt = NULL;
 		m_flDamageForceScale = 1.0f;
@@ -706,6 +707,7 @@ struct FireBulletsInfo_t
 		m_flDamage = 0;
 		m_iPlayerDamage = 0;
 		m_pAttacker = NULL;
+		m_pWeapon = NULL;
 		m_nFlags = 0;
 		m_pAdditionalIgnoreEnt = NULL;
 		m_flDamageForceScale = 1.0f;
@@ -728,6 +730,7 @@ struct FireBulletsInfo_t
 	CBaseEntity *m_pAdditionalIgnoreEnt;
 	bool m_bPrimaryAttack;
 	bool m_bUseServerRandomSeed;
+	CBaseEntity* m_pWeapon;
 };
 
 //-----------------------------------------------------------------------------

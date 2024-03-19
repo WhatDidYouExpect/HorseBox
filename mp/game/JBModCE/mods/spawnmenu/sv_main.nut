@@ -9,8 +9,18 @@ function OnClientExecCmd(client,cmd)
 		SpawnEntity(prop);
 	}
 }
-
-
+/*
+function OnTakeDamage(entindex, damage, attackerEntIndex, weaponEntIndex, damageType)
+{
+	PrintToServer(weaponEntIndex.tostring()+"\n");
+    if (weaponEntIndex != -1) // Check if a weapon was used
+    {
+        return 1000.0; // Deal 1000 dmg
+    }
+    
+    return damage; // Return OG dmg
+}
+*/
 /* tests
 
 function OnClientExecCmd(client,cmd)

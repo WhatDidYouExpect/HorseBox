@@ -1904,6 +1904,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 				CalculateBulletDamageForce( &dmgInfo, info.m_iAmmoType, vecDir, tr.endpos );
 				dmgInfo.ScaleDamageForce( info.m_flDamageForceScale );
 				dmgInfo.SetAmmoType( info.m_iAmmoType );
+				dmgInfo.SetWeapon(info.m_pWeapon);
 				tr.m_pEnt->DispatchTraceAttack( dmgInfo, vecDir, &tr );
 			
 				if ( ToBaseCombatCharacter( tr.m_pEnt ) )

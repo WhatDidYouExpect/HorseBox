@@ -2292,6 +2292,7 @@ void CBaseCombatWeapon::PrimaryAttack( void )
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
 
 	FireBulletsInfo_t info;
+	info.m_pWeapon = this;
 	info.m_vecSrc	 = pPlayer->Weapon_ShootPosition( );
 	
 	info.m_vecDirShooting = pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );

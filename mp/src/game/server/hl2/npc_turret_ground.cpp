@@ -513,7 +513,7 @@ Activity CNPC_GroundTurret::NPC_TranslateActivity( Activity activity )
 void CNPC_GroundTurret::Shoot()
 {
 	FireBulletsInfo_t info;
-
+	info.m_pWeapon = this;
 	Vector vecSrc = EyePosition();
 	Vector vecDir;
 

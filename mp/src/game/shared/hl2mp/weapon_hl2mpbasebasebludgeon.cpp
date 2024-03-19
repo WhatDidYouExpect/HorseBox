@@ -147,7 +147,7 @@ void CBaseHL2MPBludgeonWeapon::Hit( trace_t &traceHit, Activity nHitActivity )
 
 #ifndef CLIENT_DLL
 		CTakeDamageInfo info( GetOwner(), GetOwner(), GetDamageForActivity( nHitActivity ), DMG_CLUB );
-
+		info.SetWeapon(this);
 		if( pPlayer && pHitEntity->IsNPC() )
 		{
 			// If bonking an NPC, adjust damage.

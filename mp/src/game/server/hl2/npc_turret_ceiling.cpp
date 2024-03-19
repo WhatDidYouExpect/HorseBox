@@ -825,7 +825,7 @@ void CNPC_CeilingTurret::Shoot( const Vector &vecSrc, const Vector &vecDirToEnem
 	}
 
 	FireBulletsInfo_t info;
-
+	info.m_pWeapon = this;
 	if ( GetEnemy() != NULL )
 	{
 		Vector vecDir = GetActualShootTrajectory( vecSrc );

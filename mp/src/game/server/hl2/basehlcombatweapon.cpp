@@ -95,6 +95,7 @@ void CHLMachineGun::PrimaryAttack( void )
 	info.m_flDistance = MAX_TRACE_LENGTH;
 	info.m_iAmmoType = m_iPrimaryAmmoType;
 	info.m_iTracerFreq = 2;
+	info.m_pWeapon = this;
 	FireBullets( info );
 
 	//Factor in the view kick
