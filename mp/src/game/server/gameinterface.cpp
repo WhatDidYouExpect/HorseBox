@@ -1228,12 +1228,13 @@ int Squirrel_FindAllEntitiesByName(SquirrelScript script)
 	CBaseEntity* ent = UTIL_EntityByIndex(firstent);
 	SquirrelValue ret;
 	ret.type = SQUIRREL_INT;
-	
-	while (ent = gEntList.FindEntityByName(ent, name, UTIL_EntityByIndex(searchingent)))
+	ent = gEntList.FindEntityByName(ent, name, UTIL_EntityByIndex(searchingent));
+	while (ent)
 	{
 		ret.val_int = ent->entindex();
 		g_pSquirrel->PushValue(script, ret);
 		g_pSquirrel->AppendToArray(script);
+		ent = gEntList.FindEntityByName(ent, name, UTIL_EntityByIndex(searchingent));
 	}
 	
 	return 1;

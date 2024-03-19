@@ -12,6 +12,9 @@ function DrawEpicPanel(panel)
 	}
 }
 
+paths <- [];
+
+
 function DrawSpawnButton(button)
 {
 	SurfaceSetColor(255,255,255,255);
@@ -27,7 +30,7 @@ function DrawSpawnButton(button)
 
 
 
-paths <- [];
+
 
 
 function ButtonClicked(button, code)
