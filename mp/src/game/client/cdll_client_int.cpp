@@ -1812,6 +1812,17 @@ int Squirrel_SurfaceDrawRect(SquirrelScript script)
 	return 0;
 }
 
+int Squirrel_SurfaceFillRect(SquirrelScript script)
+{
+	int x1, y1, x2, y2;
+	if (!g_pSquirrel->GetArgs(script, "iiii", &x1, &y1, &x2, &y2))
+	{
+		return 0;
+	}
+	vgui::surface()->DrawFilledRect(x1, y1, x2, y2);
+	return 0;
+}
+
 
 int Squirrel_SurfaceSetColor(SquirrelScript script)
 {
@@ -2089,6 +2100,34 @@ int Squirrel_GetModelList(SquirrelScript script)
 	return 1;
 }
 
+
+int Squirrel_VGUIGetSize(SquirrelScript script)
+{
+	SquirrelHandle hand;
+	if (!g_pSquirrel->GetArgs(script, "u", &hand))
+	{
+		return 0;
+	}
+	void* ptr = CheckSquirrelHandle(hand, SP_VGUI);
+	if (!ptr)
+	{
+		return 0;
+	}
+	int wide, tall;
+	((vgui::SquirrelPanel*)ptr)->GetSize(wide, tall);
+	SquirrelValue ret;
+	ret.type = SQUIRREL_INT;
+	ret.val_int = wide;
+	g_pSquirrel->PushArray(script);
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	ret.val_int = tall;
+	g_pSquirrel->PushValue(script, ret);
+	g_pSquirrel->AppendToArray(script);
+	return 1;
+}
+
+
 void LoadMod(const char* path)
 {
 	int len = strlen(path);
@@ -2119,6 +2158,7 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "SurfaceSetColor", Squirrel_SurfaceSetColor);
 		g_pSquirrel->AddFunction(script, "SurfaceDrawText", Squirrel_SurfaceDrawText);
 		g_pSquirrel->AddFunction(script, "SurfaceDrawRect", Squirrel_SurfaceDrawRect);
+		g_pSquirrel->AddFunction(script, "SurfaceFillRect", Squirrel_SurfaceFillRect);
 		g_pSquirrel->AddFunction(script, "SurfaceSetTextColor", Squirrel_SurfaceSetTextColor);
 		g_pSquirrel->AddFunction(script, "SurfaceSetTextPos", Squirrel_SurfaceSetTextPos);
 		g_pSquirrel->AddFunction(script, "SurfaceSetTextFont", Squirrel_SurfaceSetTextFont);
@@ -2131,6 +2171,7 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "VGUISetVisible", Squirrel_VGUISetVisible);
 		g_pSquirrel->AddFunction(script, "VGUISetPosition", Squirrel_VGUISetPosition);
 		g_pSquirrel->AddFunction(script, "VGUIGetUserdata", Squirrel_VGUIGetUserdata);
+		g_pSquirrel->AddFunction(script, "VGUIGetSize", Squirrel_VGUIGetSize);
 		g_pSquirrel->AddFunction(script, "GetModelList", Squirrel_GetModelList);
 
 

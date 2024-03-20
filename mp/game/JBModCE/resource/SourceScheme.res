@@ -29,6 +29,8 @@ Scheme
 		"AchievementsLightGrey"		"79 79 79 255"
 		"AchievementsDarkGrey"		"55 55 55 255"
 		"AchievementsInactiveFG"	"130 130 130 255"
+		"DarkBrown"			"51 41 27 255"
+		"Brown"				"112 91 59 255"
 	}
  
 	///////////////////// BASE SETTINGS ////////////////////////
@@ -70,9 +72,9 @@ Scheme
 		Frame.TitleTextInsetX			16
 		Frame.ClientInsetX				8
 		Frame.ClientInsetY				6
-		Frame.BgColor					"160 160 160 128"	[$WIN32]
+		Frame.BgColor					"112 91 59 255"	[$WIN32]
 		Frame.BgColor					"80 80 80 192"		[$X360]
-		Frame.OutOfFocusBgColor			"160 160 160 32"	[$WIN32]
+		Frame.OutOfFocusBgColor			"112 91 59 255"	[$WIN32]
 		Frame.OutOfFocusBgColor			"80 80 80 192"		[$X360]
 		Frame.FocusTransitionEffectTime	"0.3"							// time it takes for a window to fade in/out on focus/out of focus
 		Frame.TransitionEffectTime		"0.3"				[$WIN32]	// time it takes for a window to fade in/out on open/close
@@ -91,7 +93,7 @@ Scheme
 		FrameTitleBar.Font				"UiBold"		[$WIN32]
 		FrameTitleBar.Font				"DefaultLarge"	[$WIN32]
 		FrameTitleBar.TextColor			"White"
-		FrameTitleBar.BgColor			"Blank"
+		FrameTitleBar.BgColor			"DarkBrown"
 		FrameTitleBar.DisabledTextColor	"255 255 255 192"
 		FrameTitleBar.DisabledBgColor	"Blank"
  
@@ -115,7 +117,7 @@ Scheme
 		ListPanel.EmptyListInfoTextColor	"OffWhite"
  
 		Menu.TextColor					"White"
-		Menu.BgColor					"160 160 160 64"
+		Menu.BgColor					"Brown"
 		Menu.ArmedTextColor				"Black"
 		Menu.ArmedBgColor				"Orange"
 		Menu.TextInset					"6"
@@ -147,8 +149,8 @@ Scheme
 		ScrollBarButton.DepressedFgColor	"White"
 		ScrollBarButton.DepressedBgColor	"Blank"
  
-		ScrollBarSlider.FgColor				"Blank"			// nob color
-		ScrollBarSlider.BgColor				"255 255 255 64"	// slider background color
+		ScrollBarSlider.FgColor				"Brown"			// nob color
+		ScrollBarSlider.BgColor				"DarkBrown"	// slider background color
  
 		SectionedListPanel.HeaderTextColor	"White"
 		SectionedListPanel.HeaderBgColor	"Blank"
@@ -887,7 +889,62 @@ Scheme
 		FrameBorder
 		{
 			// rounded corners for frames
-			"backgroundtype" "2"
+			Left
+			{
+				"1"
+				{
+					"color" "255 255 255 255"
+					"offset" "0 1"
+				}
+				"2"
+				{
+					"color" "Border.Bright"
+					"offset" "1 2"
+				}
+			}
+ 
+			Right
+			{
+				"1"
+				{
+					"color" "0 0 0 255"
+					"offset" "0 0"
+				}
+				"2"
+				{
+					"color" "Border.Dark"
+					"offset" "1 2"
+				}
+			}
+ 
+			Top
+			{
+				"1"
+				{
+					"color" "255 255 255 255"
+					"offset" "0 1"
+				}
+				"2"
+				{
+					"color" "Border.Bright"
+					"offset" "2 2"
+				}
+			}
+ 
+			Bottom
+			{
+				"1"
+				{
+					"color" "0 0 0 255"
+					"offset" "0 0"
+				}
+				"2"
+				{
+					"color" "Border.Dark"
+					"offset" "1 1"
+				}
+			}
+			
 		}
  
 		DepressedBorder
@@ -897,8 +954,13 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Dark"
+					"color" "0 0 0 255"
 					"offset" "0 1"
+				}
+				"2"
+				{
+					"color" "Border.Dark"
+					"offset" "1 2"
 				}
 			}
  
@@ -906,8 +968,13 @@ Scheme
 			{
 				"1"
 				{
+					"color" "255 255 255 255"
+					"offset" "0 0"
+				}
+				"2"
+				{
 					"color" "Border.Bright"
-					"offset" "1 0"
+					"offset" "1 2"
 				}
 			}
  
@@ -915,8 +982,13 @@ Scheme
 			{
 				"1"
 				{
+					"color" "0 0 0 255"
+					"offset" "0 1"
+				}
+				"2"
+				{
 					"color" "Border.Dark"
-					"offset" "0 0"
+					"offset" "2 2"
 				}
 			}
  
@@ -924,8 +996,13 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Bright"
+					"color" "255 255 255 255"
 					"offset" "0 0"
+				}
+				"2"
+				{
+					"color" "Border.Bright"
+					"offset" "1 1"
 				}
 			}
 		}
@@ -936,8 +1013,13 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Bright"
+					"color" "255 255 255 255"
 					"offset" "0 1"
+				}
+				"2"
+				{
+					"color" "Border.Bright"
+					"offset" "1 2"
 				}
 			}
  
@@ -945,8 +1027,13 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Dark"
+					"color" "0 0 0 255"
 					"offset" "0 0"
+				}
+				"2"
+				{
+					"color" "Border.Dark"
+					"offset" "1 2"
 				}
 			}
  
@@ -954,8 +1041,13 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Bright"
+					"color" "255 255 255 255"
 					"offset" "0 1"
+				}
+				"2"
+				{
+					"color" "Border.Bright"
+					"offset" "2 2"
 				}
 			}
  
@@ -963,8 +1055,13 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Dark"
+					"color" "0 0 0 255"
 					"offset" "0 0"
+				}
+				"2"
+				{
+					"color" "Border.Dark"
+					"offset" "1 1"
 				}
 			}
 		}
@@ -1073,6 +1170,11 @@ Scheme
 			{
 				"1"
 				{
+					"color" "255 255 255 255"
+					"offset" "0 1"
+				}
+				"2"
+				{
 					"color" "Border.Bright"
 					"offset" "0 1"
 				}
@@ -1081,6 +1183,11 @@ Scheme
 			Right
 			{
 				"1"
+				{
+					"color" "0 0 0 255"
+					"offset" "1 0"
+				}
+				"2"
 				{
 					"color" "Border.Dark"
 					"offset" "1 0"
@@ -1091,8 +1198,13 @@ Scheme
 			{
 				"1"
 				{
+					"color" "255 255 255 255"
+					"offset" "0 1"
+				}
+				"2"
+				{
 					"color" "Border.Bright"
-					"offset" "0 0"
+					"offset" "1 1"
 				}
 			}
  
@@ -1105,14 +1217,24 @@ Scheme
 			{
 				"1"
 				{
+					"color" "255 255 255 255"
+					"offset" "0 1"
+				}
+				"2"
+				{
 					"color" "Border.Bright"
-					"offset" "0 0"
+					"offset" "-1 1"
 				}
 			}
  
 			Right
 			{
 				"1"
+				{
+					"color" "0 0 0 255"
+					"offset" "1 0"
+				}
+				"2"
 				{
 					"color" "Border.Dark"
 					"offset" "1 0"
@@ -1123,8 +1245,13 @@ Scheme
 			{
 				"1"
 				{
+					"color" "255 255 255 255"
+					"offset" "0 1"
+				}
+				"2"
+				{
 					"color" "Border.Bright"
-					"offset" "0 0"
+					"offset" "1 1"
 				}
 			}
  
@@ -1179,52 +1306,75 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Selection"
+					"color" "0 0 0 255"
 					"offset" "0 0"
 				}
 				"2"
 				{
-					"color" "Border.Bright"
-					"offset" "0 1"
+					"color" "255 255 255 255"
+					"offset" "1 2"
 				}
-			}
-			Top
-			{
-				"1"
-				{
-					"color" "Border.Selection"
-					"offset" "0 0"
-				}
-				"2"
+				"3"
 				{
 					"color" "Border.Bright"
-					"offset" "1 0"
+					"offset" "2 3"
 				}
 			}
+ 
 			Right
 			{
 				"1"
 				{
-					"color" "Border.Selection"
+					"color" "0 0 0 255"
 					"offset" "0 0"
 				}
 				"2"
 				{
+					"color" "0 0 0 255"
+					"offset" "1 1"
+				}
+				"3"
+				{
 					"color" "Border.Dark"
-					"offset" "1 0"
+					"offset" "2 3"
 				}
 			}
+ 
+			Top
+			{
+				"1"
+				{
+					"color" "0 0 0 255"
+					"offset" "0 0"
+				}
+				"2"
+				{
+					"color" "255 255 255 255"
+					"offset" "1 2"
+				}
+				"3"
+				{
+					"color" "Border.Bright"
+					"offset" "3 3"
+				}
+			}
+ 
 			Bottom
 			{
 				"1"
 				{
-					"color" "Border.Selection"
+					"color" "0 0 0 255"
 					"offset" "0 0"
 				}
 				"2"
 				{
+					"color" "0 0 0 255"
+					"offset" "1 1"
+				}
+				"3"
+				{
 					"color" "Border.Dark"
-					"offset" "0 0"
+					"offset" "2 2"
 				}
 			}
 		}
@@ -1236,8 +1386,13 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Dark"
+					"color" "0 0 0 255"
 					"offset" "0 1"
+				}
+				"2"
+				{
+					"color" "Border.Dark"
+					"offset" "1 2"
 				}
 			}
  
@@ -1245,8 +1400,13 @@ Scheme
 			{
 				"1"
 				{
+					"color" "255 255 255 255"
+					"offset" "0 0"
+				}
+				"2"
+				{
 					"color" "Border.Bright"
-					"offset" "1 0"
+					"offset" "1 2"
 				}
 			}
  
@@ -1254,8 +1414,13 @@ Scheme
 			{
 				"1"
 				{
+					"color" "0 0 0 255"
+					"offset" "0 1"
+				}
+				"2"
+				{
 					"color" "Border.Dark"
-					"offset" "0 0"
+					"offset" "2 2"
 				}
 			}
  
@@ -1263,8 +1428,13 @@ Scheme
 			{
 				"1"
 				{
-					"color" "Border.Bright"
+					"color" "255 255 255 255"
 					"offset" "0 0"
+				}
+				"2"
+				{
+					"color" "Border.Bright"
+					"offset" "1 1"
 				}
 			}
 		}
