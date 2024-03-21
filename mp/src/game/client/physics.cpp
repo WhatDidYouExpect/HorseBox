@@ -23,6 +23,8 @@
 #include "fx_water.h"
 #include "positionwatcher.h"
 #include "vphysics/constraints.h"
+// xorusr
+#include "../../common/build/buildprops.def"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -194,8 +196,10 @@ void PhysicsReset()
 	physenv->ResetSimulationClock();
 }
 
-
+//xorusr
+#if SVRAGDOLL == 0
 ConVar cl_ragdoll_collide( "cl_ragdoll_collide", "0" );
+#endif
 
 int CCollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1, void *pGameData0, void *pGameData1 )
 #if _DEBUG
@@ -241,8 +245,13 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 
 	if ( (pObj0->GetGameFlags() & FVPHYSICS_PART_OF_RAGDOLL) && (pObj1->GetGameFlags() & FVPHYSICS_PART_OF_RAGDOLL) )
 	{
+//xorusr
+#if SVRAGDOLL == 1
+		return 1;
+#elif SVRAGDOLL == 0
 		if ( !cl_ragdoll_collide.GetBool() )
 			return 0;
+#endif
 	}
 
 	// check contents

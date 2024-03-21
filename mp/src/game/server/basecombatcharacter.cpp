@@ -38,6 +38,8 @@
 #include "rumble_shared.h"
 #include "saverestoretypes.h"
 #include "nav_mesh.h"
+// xorusr
+#include "../../common/build/buildprops.def"
 
 #ifdef NEXT_BOT
 #include "NextBot/NextBotManager.h"
@@ -1657,7 +1659,14 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 
 		if ( !bRagdollCreated && ( info.GetDamageType() & DMG_REMOVENORAGDOLL ) == 0 )
 		{
+//xorusr
+#if SVRAGDOLL == 1
+			CBaseEntity *pRagdoll = CreateServerRagdoll( this, m_nForceBone, info, COLLISION_GROUP_PLAYER, true );
+			FixupBurningServerRagdoll( pRagdoll );
+			RemoveDeferred();
+#elif SVRAGDOLL == 0
 			BecomeRagdoll( info, forceVector );
+#endif
 		}
 	}
 	
