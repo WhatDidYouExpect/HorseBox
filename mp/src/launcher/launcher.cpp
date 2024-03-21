@@ -108,12 +108,12 @@ void GetAppManifest(const char* appid, const char* path)
 	switch (Q_atoi(appid))
 	{
 	case 220: //hl2
-		PatchSearchPath(searchpaths, "hl2", appDir);
 		break;
 	case 240: //cs:s
 		PatchSearchPath(searchpaths, "cstrike/cstrike_pak.vpk", appDir);
 		break;
 	case 243750:
+		PatchSearchPath(searchpaths, "hl2", appDir);
 		PatchSearchPath(searchpaths, "hl2/hl2_textures.vpk", appDir);
 		PatchSearchPath(searchpaths, "hl2/hl2_sound_vo_english.vpk", appDir);
 		PatchSearchPath(searchpaths, "hl2/hl2_sound_misc.vpk", appDir);

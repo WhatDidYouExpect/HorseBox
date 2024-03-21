@@ -1037,6 +1037,27 @@ int Squirrel_EntitySetKeyvalue(SquirrelScript script)
 	return 0;
 }
 
+int Squirrel_EntityGetKeyvalue(SquirrelScript script)
+{
+	int ent;
+	const char* key;
+	if (!g_pSquirrel->GetArgs(script, "is", &ent, &key))
+	{
+		return 0;
+	}
+	CBaseEntity* baseent = UTIL_EntityByIndex(ent);
+	if (!baseent)
+	{
+		return 0;
+	}
+	char value[256];
+	SquirrelValue ret;
+	ret.type = SQUIRREL_STRING;
+	ret.val_int = baseent->GetKeyValue(key, value, 256);
+	g_pSquirrel->PushValue(script, ret);
+	return 1;
+}
+
 int Squirrel_EntitySpawn(SquirrelScript script)
 {
 	int ent;
@@ -1557,6 +1578,7 @@ void LoadMod(const char* path)
 		g_pSquirrel->AddFunction(script, "GiveNamedItem", Squirrel_GiveNamedItem);
 		g_pSquirrel->AddFunction(script, "CreateEntity", Squirrel_EntityCreate);
 		g_pSquirrel->AddFunction(script, "SetEntityKeyvalue", Squirrel_EntitySetKeyvalue);
+		g_pSquirrel->AddFunction(script, "GetEntityKeyvalue", Squirrel_EntityGetKeyvalue);
 		g_pSquirrel->AddFunction(script, "SpawnEntity", Squirrel_EntitySpawn);
 		g_pSquirrel->AddFunction(script, "EntityGetPosition", Squirrel_EntityGetPosition);
 		g_pSquirrel->AddFunction(script, "EntityGetRotation", Squirrel_EntityGetRotation);
@@ -3655,10 +3677,18 @@ void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
 	
 	for (int i = 0; i < squirrelscripts.Count(); i++)
 	{
-		if(pPlayer)
-			g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientExecCmd", "is", pPlayer->entindex(), args.GetCommandString());
+		if (pPlayer)
+		{
+			SquirrelValue handled = g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientExecCmd", "is", pPlayer->entindex(), args.GetCommandString());
+			if (handled.type == SQUIRREL_BOOL && handled.val_bool)
+				return;
+		}
 		else
-			g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientExecCmd", "is", 0, args.GetCommandString());
+		{
+			SquirrelValue handled = g_pSquirrel->CallFunction(squirrelscripts[i], "OnClientExecCmd", "is", 0, args.GetCommandString());
+			if (handled.type == SQUIRREL_BOOL && handled.val_bool)
+				return;
+		}
 	}
 	::ClientCommand( pPlayer, args );
 }
