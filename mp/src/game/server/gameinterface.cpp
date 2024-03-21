@@ -1657,30 +1657,7 @@ bool CServerGameDLL::GameInit( void )
 		gameeventmanager->FireEvent( event );
 	}
 
-	for (int i = 0; i < squirrelscripts.Count(); ++i)
-	{
-		g_pSquirrel->ShutdownScript(squirrelscripts[i]);
-	}
-
-	squirrelscripts.RemoveAll();
-
-	FileFindHandle_t findHandle;
-	const char* pszFileName = g_pFullFileSystem->FindFirst("mods/*", &findHandle);
-	while (pszFileName)
-	{
-		if (pszFileName[0] == '.')
-		{
-			pszFileName = g_pFullFileSystem->FindNext(findHandle);
-			continue;
-		}
-		if (g_pFullFileSystem->FindIsDirectory(findHandle))
-		{
-			LoadFilesInDirectory(pszFileName, pszFileName, "sv_main");
-			pszFileName = g_pFullFileSystem->FindNext(findHandle);
-			continue;
-		}
-		pszFileName = g_pFullFileSystem->FindNext(findHandle);
-	}
+	
 
 	return true;
 }
@@ -1885,6 +1862,40 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	// clear any pending autosavedangerous
 	m_fAutoSaveDangerousTime = 0.0f;
 	m_fAutoSaveDangerousMinHealthToCommit = 0.0f;
+
+	for (int i = 0; i < squirrelscripts.Count(); ++i)
+	{
+		g_pSquirrel->ShutdownScript(squirrelscripts[i]);
+	}
+
+	squirrelscripts.RemoveAll();
+
+	FileFindHandle_t findHandle;
+	const char* pszFileName = g_pFullFileSystem->FindFirst("mods/*", &findHandle);
+	while (pszFileName)
+	{
+		if (pszFileName[0] == '.')
+		{
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		if (g_pFullFileSystem->FindIsDirectory(findHandle))
+		{
+			LoadFilesInDirectory(pszFileName, pszFileName, "sv_main");
+			pszFileName = g_pFullFileSystem->FindNext(findHandle);
+			continue;
+		}
+		pszFileName = g_pFullFileSystem->FindNext(findHandle);
+	}
+	g_pFullFileSystem->FindClose(findHandle);
+	char mapScript[MAX_PATH] = "maps/";
+	
+	V_strncat(mapScript, pMapName, MAX_PATH);
+	V_strncat(mapScript, "/sv_main.nut", MAX_PATH);
+	if (g_pFullFileSystem->FileExists(mapScript))
+	{
+		LoadMod(mapScript);
+	}
 	return true;
 }
 
