@@ -1115,7 +1115,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//=========================================================
 	bool CMultiplayRules::FAllowNPCs( void )
 	{
-		return true; // E3 hack
+//fuck
 		return ( allowNPCs.GetInt() != 0 );
 	}
 
