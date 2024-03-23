@@ -2053,6 +2053,31 @@ void UTIL_ValidateSoundName( string_t &name, const char *defaultStr )
 	}
 }
 
+CBasePlayer* UTIL_GetNearestPlayer(const Vector& origin)
+{
+	float distToNearest = 99999999999999999999999999999999999999.0f;
+	CBasePlayer* pNearest = NULL;
+
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
+		if (!pPlayer)
+			continue;
+
+		float flDist = (pPlayer->GetAbsOrigin() - origin).LengthSqr();
+		if (flDist < distToNearest)
+
+		{
+			pNearest = pPlayer;
+			distToNearest = flDist;
+
+		}
+	}
+
+
+	return pNearest;
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Slightly modified strtok. Does not modify the input string. Does
