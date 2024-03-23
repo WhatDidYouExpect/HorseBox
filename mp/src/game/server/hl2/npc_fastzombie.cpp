@@ -918,7 +918,8 @@ void CFastZombie::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CFastZombie::AlertSound( void )
 {
-	CBasePlayer *pPlayer = UTIL_GetNearestPlayer(GetAbsOrigin());
+//	CBasePlayer *pPlayer = UTIL_GetNearestPlayer(GetAbsOrigin()); // fuck me later
+	CBaseEntity *pPlayer = AI_GetSinglePlayer();
 
 	if( pPlayer )
 	{
