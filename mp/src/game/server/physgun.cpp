@@ -29,6 +29,7 @@ ConVar phys_gunvel("phys_gunvel", "3000");
 ConVar phys_gunforce("phys_gunforce", "5e5" );
 ConVar phys_guntorque("phys_guntorque", "100" );
 ConVar phys_gunglueradius("phys_gunglueradius", "128" );
+ConVar phys_gunrotationspeed("phys_gunrotationspeed", "10");
 
 static int g_physgunBeam;
 #define PHYSGUN_BEAM_SPRITE		"sprites/physbeam.vmt"
@@ -424,28 +425,40 @@ IMotionEvent::simresult_e CGravControllerPoint::Simulate( IPhysicsMotionControll
 	else
 	{
 		// clamp future velocity to max speed
-		Vector nextVel = delta + vel;
-		float nextSpeed = nextVel.Length();
-		if ( nextSpeed > m_maxVel )
-		{
-			nextVel *= (m_maxVel / nextSpeed);
-			delta = nextVel - vel;
-		}
+		QAngle angles;
+		Vector origin;
+		pObject->GetShadowPosition(&origin, &angles);
+		VMatrix tmp = SetupMatrixOrgAngles(origin, angles);
+		Vector axis;
+		float angle;
+		RotationDeltaAxisAngle(angles, m_targetRotation, axis, angle);
+		
 
-		delta *= invDeltaTime;
+		//delta *= invDeltaTime;
 
-		float linearAccel = delta.Length();
-		if ( linearAccel > m_maxAcceleration )
-		{
-			delta *= m_maxAcceleration / linearAccel;
-		}
+		
 
 		Vector accel;
 		AngularImpulse angAccel;
 		pObject->CalculateForceOffset( delta, world, &accel, &angAccel );
 		
-		linear += accel;
-		angular += angAccel;
+		
+		linear = delta;
+		//linear -= vel;
+		linear *= invDeltaTime;
+
+		float linearAccel = delta.Length();
+		if (linearAccel > m_maxAcceleration)
+		{
+			delta *= m_maxAcceleration / linearAccel;
+		}
+
+		//linear += accel;
+		//angular += angAccel;
+		//Msg("%f\n",angVel.Dot(axis * angle)/360);
+		angular = WorldToLocalRotation(tmp, axis, angle)*40;
+		angular -= angVel;
+		angular *= invDeltaTime;
 	}
 	
 	return SIM_GLOBAL_ACCELERATION;
@@ -737,24 +750,11 @@ void CWeaponGravityGun::EffectUpdate( void )
 	CBaseEntity *pObject = m_hObject;
 	if ( pObject )
 	{
-		if ( m_useDown )
-		{
-			if ( pOwner->m_afButtonPressed & IN_USE )
-			{
-				m_useDown = false;
-			}
-		}
-		else 
-		{
-			if ( pOwner->m_afButtonPressed & IN_USE )
-			{
-				m_useDown = true;
-			}
-		}
 
-		if ( m_useDown )
+		if ( pOwner->m_nButtons & IN_USE )
 		{
-			pOwner->SetPhysicsFlag( PFLAG_DIROVERRIDE, true );
+			//pOwner->SetPhysicsFlag( PFLAG_DIROVERRIDE, true );
+			//pOwner->AddFlag(FL_ATCONTROLS);
 			if ( pOwner->m_nButtons & IN_FORWARD )
 			{
 				m_distance = UTIL_Approach( 1024, m_distance, gpGlobals->frametime * 100 );
@@ -763,6 +763,20 @@ void CWeaponGravityGun::EffectUpdate( void )
 			{
 				m_distance = UTIL_Approach( 40, m_distance, gpGlobals->frametime * 100 );
 			}
+			// Add the incremental player yaw to the target transform
+			matrix3x4_t curMatrix, incMatrix, nextMatrix, rightMatrix;
+			AngleMatrix(m_gravCallback.m_targetRotation, curMatrix);
+			float rotspeed = phys_gunrotationspeed.GetFloat() / 100.0;
+			AngleMatrix(QAngle(0, (float)(pOwner->GetLastUserCommand()->mousedx) * rotspeed, 0), incMatrix);
+			MatrixBuildRotationAboutAxis(right, (float)(pOwner->GetLastUserCommand()->mousedy) * rotspeed, rightMatrix);
+			ConcatTransforms(rightMatrix, incMatrix, incMatrix);
+			ConcatTransforms(incMatrix, curMatrix, nextMatrix);
+			MatrixAngles(nextMatrix, m_gravCallback.m_targetRotation);
+
+
+			
+
+			
 		}
 
 		if ( pOwner->m_nButtons & IN_WEAPON1 )
@@ -848,13 +862,13 @@ void CWeaponGravityGun::EffectUpdate( void )
 void CWeaponGravityGun::SoundCreate( void )
 {
 	m_soundState = SS_SCANNING;
-	SoundStart();
+	//SoundStart();
 }
 
 
 void CWeaponGravityGun::SoundDestroy( void )
 {
-	SoundStop();
+	//SoundStop();
 }
 
 
@@ -1192,7 +1206,7 @@ IPhysicsObject *CWeaponGravityGun::GetPelletPhysObject( int pelletIndex )
 void CWeaponGravityGun::EffectDestroy( void )
 {
 	m_active = false;
-	SoundStop();
+	//SoundStop();
 
 	DetachObject();
 }
@@ -1264,12 +1278,12 @@ void CWeaponGravityGun::PrimaryAttack( void )
 	{
 		SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 		EffectCreate();
-		SoundCreate();
+		//SoundCreate();
 	}
 	else
 	{
 		EffectUpdate();
-		SoundUpdate();
+		//SoundUpdate();
 	}
 }
 
@@ -1280,7 +1294,7 @@ void CWeaponGravityGun::SecondaryAttack( void )
 	if ( m_active )
 	{
 		EffectDestroy();
-		SoundDestroy();
+		//SoundDestroy();
 		return;
 	}
 	return;
@@ -1370,7 +1384,7 @@ void CWeaponGravityGun::WeaponIdle( void )
 		}
 
 		EffectDestroy();  
-		SoundDestroy();
+		//SoundDestroy();
 	}
 }
 
