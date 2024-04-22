@@ -1726,7 +1726,6 @@ void CNPC_CombineGunship::FireCannonRound( void )
 
 		// Fire directly at the target
 		FireBulletsInfo_t info( 1, vecMuzzle, vecToEnemy, vec3_origin, MAX_COORD_RANGE, m_iAmmoType );
-		info.m_pWeapon = this;
 		info.m_iTracerFreq = 1;
 		CAmmoDef *pAmmoDef = GetAmmoDef();
 		info.m_iPlayerDamage = pAmmoDef->PlrDamage( m_iAmmoType );

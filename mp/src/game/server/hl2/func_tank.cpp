@@ -2458,7 +2458,7 @@ void CFuncTankGun::Fire( int bulletCount, const Vector &barrelEnd, const Vector 
 	info.m_iPlayerDamage = m_iBulletDamageVsPlayer;
 	info.m_pAttacker = pAttacker;
 	info.m_pAdditionalIgnoreEnt = GetParent();
-	info.m_pWeapon = this;
+
 #ifdef HL2_EPISODIC
 	if ( m_iAmmoType != -1 )
 	{
@@ -3010,7 +3010,7 @@ void CFuncTankAirboatGun::Fire( int bulletCount, const Vector &barrelEnd, const 
 		info.m_iShots = 2;
 		info.m_vecSpread = VECTOR_CONE_5DEGREES;
 	}
-	info.m_pWeapon = this;
+
 	FireBullets( info );
 
 	DoMuzzleFlash();

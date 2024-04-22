@@ -1441,16 +1441,10 @@ int CBaseEntity::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 // Purpose: Scale damage done and call OnTakeDamage
 //-----------------------------------------------------------------------------
-
-#include "squirrel/squirrel.h"
-extern ISquirrel* g_pSquirrel;
-extern CUtlVector<SquirrelScript> squirrelscripts;
 int CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 {
 	if ( !g_pGameRules )
 		return 0;
-
-	
 
 	bool bHasPhysicsForceDamage = !g_pGameRules->Damage_NoPhysicsForce( inputInfo.GetDamageType() );
 	if ( bHasPhysicsForceDamage && inputInfo.GetDamageType() != DMG_GENERIC )
@@ -1506,16 +1500,6 @@ int CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 
 		// Scale the damage by my own modifiers
 		info.ScaleDamage( GetReceivedDamageScale( info.GetAttacker() ) );
-		for (int i = 0; i < squirrelscripts.Count(); i++)
-		{
-			SquirrelValue newdmg = g_pSquirrel->CallFunction(squirrelscripts[i], "OnTakeDamage", "ifiii", entindex(), info.GetDamage(), info.GetAttacker() ? info.GetAttacker()->entindex() : -1, info.GetWeapon() ? info.GetWeapon()->entindex() : -1, info.GetDamageType());
-			if (newdmg.type != SQUIRREL_FLOAT)
-			{
-				continue;
-			}
-			info.SetDamage(newdmg.val_float);
-
-		}
 
 		//Msg("%s took %.2f Damage, at %.2f\n", GetClassname(), info.GetDamage(), gpGlobals->curtime );
 
@@ -1654,11 +1638,6 @@ void CBaseEntity::Event_Killed( const CTakeDamageInfo &info )
 	{
 		info.GetAttacker()->Event_KilledOther(this, info);
 	}
-	for (int i = 0; i < squirrelscripts.Count(); i++)
-	{
-		g_pSquirrel->CallFunction(squirrelscripts[i], "OnEntityKilled", "ifiii", entindex(), info.GetDamage(), info.GetAttacker() ? info.GetAttacker()->entindex() : -1, info.GetWeapon() ? info.GetWeapon()->entindex() : -1, info.GetDamageType());
-	}
-
 
 	m_takedamage = DAMAGE_NO;
 	m_lifeState = LIFE_DEAD;
@@ -5107,9 +5086,9 @@ void CC_Ent_Remove( const CCommand& args )
 			CBaseEntity *ent = NULL;
 			while ( (ent = gEntList.NextEnt(ent)) != NULL )
 			{
-				if (  ((ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
+				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
 					(ent->m_iClassname != NULL_STRING	&& FStrEq(args[1], STRING(ent->m_iClassname))) ||
-					(ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname()))))
+					(ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
 				{
 					pEntity = ent;
 					break;
@@ -5119,7 +5098,7 @@ void CC_Ent_Remove( const CCommand& args )
 	}
 
 	// Found one?
-	if ( pEntity && !pEntity->ClassMatches("player") && !pEntity->ClassMatches("info_player_*"))
+	if ( pEntity )
 	{
 		Msg( "Removed %s(%s)\n", STRING(pEntity->m_iClassname), pEntity->GetDebugName() );
 		UTIL_Remove( pEntity );
@@ -5142,10 +5121,9 @@ void CC_Ent_RemoveAll( const CCommand& args )
 		CBaseEntity *ent = NULL;
 		while ( (ent = gEntList.NextEnt(ent)) != NULL )
 		{
-			if (  ((ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
+			if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
 				  (ent->m_iClassname != NULL_STRING	&& FStrEq(args[1], STRING(ent->m_iClassname))) ||
-				  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))&& !ent->ClassMatches("player")
-				&& !ent->ClassMatches("info_player_*"))
+				  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
 			{
 				UTIL_Remove( ent );
 				iCount++;
@@ -7378,14 +7356,10 @@ void CC_Ent_Create( const CCommand& args )
 				return;
 		}
 	}
-	else if (!Q_stricmp(args[1], "player"))
-	{
-		return;
-	}
 
 	bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
 	CBaseEntity::SetAllowPrecache( true );
-	
+
 	// Try to create entity
 	CBaseEntity *entity = dynamic_cast< CBaseEntity * >( CreateEntityByName(args[1]) );
 	if (entity)

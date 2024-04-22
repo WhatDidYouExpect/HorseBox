@@ -38,8 +38,6 @@
 #include "rumble_shared.h"
 #include "saverestoretypes.h"
 #include "nav_mesh.h"
-// xorusr
-#include "../../common/build/buildprops.def"
 
 #ifdef NEXT_BOT
 #include "NextBot/NextBotManager.h"
@@ -1659,14 +1657,7 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 
 		if ( !bRagdollCreated && ( info.GetDamageType() & DMG_REMOVENORAGDOLL ) == 0 )
 		{
-//xorusr
-#if SVRAGDOLL == 1
-			CBaseEntity *pRagdoll = CreateServerRagdoll( this, m_nForceBone, info, COLLISION_GROUP_PLAYER, true );
-			FixupBurningServerRagdoll( pRagdoll );
-			RemoveDeferred();
-#elif SVRAGDOLL == 0
 			BecomeRagdoll( info, forceVector );
-#endif
 		}
 	}
 	
@@ -2382,20 +2373,12 @@ When a NPC is poisoned via an arrow etc it takes all the poison damage at once.
 GLOBALS ASSUMED SET:  g_iSkillLevel
 ============
 */
-
-
-#include "squirrel/squirrel.h"
-extern ISquirrel* g_pSquirrel;
-extern CUtlVector<SquirrelScript> squirrelscripts;
-
 int CBaseCombatCharacter::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	int retVal = 0;
 
 	if (!m_takedamage)
 		return 0;
-
-	
 
 	m_iDamageCount++;
 
@@ -2444,11 +2427,6 @@ int CBaseCombatCharacter::OnTakeDamage( const CTakeDamageInfo &info )
 			}
 			
 			bool bGibbed = false;
-
-			for (int i = 0; i < squirrelscripts.Count(); i++)
-			{
-				g_pSquirrel->CallFunction(squirrelscripts[i], "OnEntityKilled", "ifiii", entindex(), info.GetDamage(), info.GetAttacker() ? info.GetAttacker()->entindex() : -1, info.GetWeapon() ? info.GetWeapon()->entindex() : -1, info.GetDamageType());
-			}
 
 			Event_Killed( info );
 

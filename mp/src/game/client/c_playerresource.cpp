@@ -68,7 +68,7 @@ C_PlayerResource::C_PlayerResource()
 #ifdef HL2MP
 	m_Colors[TEAM_COMBINE] = COLOR_BLUE;
 	m_Colors[TEAM_REBELS] = COLOR_RED;
-	m_Colors[TEAM_UNASSIGNED] = COLOR_WHITE;
+	m_Colors[TEAM_UNASSIGNED] = COLOR_YELLOW;
 #endif
 
 	g_PR = this;

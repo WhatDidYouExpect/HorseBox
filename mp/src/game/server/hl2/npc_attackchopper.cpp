@@ -1826,7 +1826,7 @@ void CNPC_AttackHelicopter::ShootAtPlayer( const Vector &vBasePos, const Vector 
 	info.m_iTracerFreq = 1;
 	info.m_vecDirShooting = GetActualShootTrajectory( vBasePos );
 	info.m_nFlags = FIRE_BULLETS_TEMPORARY_DANGER_SOUND;
-	info.m_pWeapon = this;
+
 	DoMuzzleFlash();
 
 	QAngle	vGunAng;
@@ -2014,7 +2014,6 @@ void CNPC_AttackHelicopter::ShootInsideCircleOfDeath( const Vector &vBasePos, co
 	}
 
 	FireBulletsInfo_t info( 1, vBasePos, vecFireDirection, VECTOR_CONE_PRECALCULATED, MAX_COORD_RANGE, m_iAmmoType );
-	info.m_pWeapon = this;
 	info.m_iTracerFreq = 1;
 	info.m_nFlags = FIRE_BULLETS_TEMPORARY_DANGER_SOUND;
 
@@ -2078,7 +2077,6 @@ void CNPC_AttackHelicopter::ShootAtVehicle( const Vector &vBasePos, const Vector
 			}
 			
 			FireBulletsInfo_t info( 1, vBasePos, vecShotDir, VECTOR_CONE_PRECALCULATED, MAX_COORD_RANGE, m_iAmmoType );
-			info.m_pWeapon = this;
 			info.m_iTracerFreq = 1;
 			FireBullets( info );
 		}
@@ -2100,7 +2098,6 @@ void CNPC_AttackHelicopter::ShootAtVehicle( const Vector &vBasePos, const Vector
 		VectorNormalize( vecDir );
 
 		FireBulletsInfo_t info( 1, vBasePos, vecDir, VECTOR_CONE_PRECALCULATED, MAX_COORD_RANGE, m_iAmmoType );
-		info.m_pWeapon = this;
 		info.m_iTracerFreq = 1;
 		FireBullets( info );
 		--nShotsRemaining;
@@ -2144,7 +2141,6 @@ void CNPC_AttackHelicopter::ShootAtVehicle( const Vector &vBasePos, const Vector
 
 			// I put in all the default arguments simply so I could guarantee the first shot of one of the bursts always hits
 			FireBulletsInfo_t info( 1, vBasePos, vecFireDirection, VECTOR_CONE_PRECALCULATED, MAX_COORD_RANGE, m_iAmmoType );
-			info.m_pWeapon = this;
 			info.m_iTracerFreq = 1;
 			FireBullets( info );
 		}
@@ -2462,7 +2458,6 @@ void CNPC_AttackHelicopter::ShootAtFacingDirection( const Vector &vBasePos, cons
 				if ( flSinAngle <= flSinConeDegrees )
 				{
 					FireBulletsInfo_t info( 1, vBasePos, vecDelta, VECTOR_CONE_PRECALCULATED, 8192, m_iAmmoType );
-					info.m_pWeapon = this;
 					info.m_iTracerFreq = 1;
 					FireBullets( info );
 					--nShotCount;
@@ -2482,7 +2477,6 @@ void CNPC_AttackHelicopter::ShootAtFacingDirection( const Vector &vBasePos, cons
 
 	FireBulletsInfo_t info( nShotCount, vBasePos, vGunDir, vecSpread, 8192, m_iAmmoType );
 	info.m_iTracerFreq = 1;
-	info.m_pWeapon = this;
 	FireBullets( info );
 }
 

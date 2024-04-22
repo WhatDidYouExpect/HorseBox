@@ -664,8 +664,6 @@ $Project
 		//Haptics
 		$File	"$SRCDIR\public\haptics\haptic_msgs.cpp"
 		$File	"$SRCDIR\public\haptics\haptic_utils.cpp"	[$WIN32]
-		$File	"$SRCDIR\game\server\squirrelentity.cpp"
-		$File	"$SRCDIR\game\server\squirrelentity.h"
 
 		// Not using precompiled header cbase.h
 

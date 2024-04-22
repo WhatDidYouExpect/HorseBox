@@ -1,3 +1,0 @@
-//file with build properties
-
-#define SVRAGDOLL 1 // 1 - server-side ragdolls like in Source Engine 2004, 0 - broken shitty ragdolls

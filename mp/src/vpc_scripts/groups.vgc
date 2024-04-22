@@ -22,8 +22,6 @@ $Group "game"
 	"server"
 	"tier1"
 	"vgui_controls"
-	"launcher"
-	"squirrel"
 }
 
 $Group "shaders"
@@ -58,8 +56,6 @@ $Group "everything"
 	"vvis_dll"
 	"vvis_launcher"
 	"togl"
-	"launcher"
-	"squirrel"
 }
 
 $Group "dedicated"

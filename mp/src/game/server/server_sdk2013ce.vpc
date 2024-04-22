@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME 	"jbmodce" [!$SOURCESDK]
-$Macro GAMENAME 	"jbmodce" [$SOURCESDK]
+$Macro GAMENAME 	"sdk2013ce" [!$SOURCESDK]
+$Macro GAMENAME 	"mod_sdk2013ce" [$SOURCESDK]
 
 $Include "$SRCDIR\game\server\server_base.vpc"
 $Include "$SRCDIR\game\server\nav_mesh.vpc" [$SOURCESDK]
@@ -208,7 +208,6 @@ $Project "Server"
 			$File	"hl2\npc_vortigaunt_episodic.cpp"
 			$File	"hl2\npc_vortigaunt_episodic.h"
 			$File	"hl2\npc_zombie.cpp"
-			$File	"hl2\npc_fastzombie.cpp"
 			$File	"hl2\point_apc_controller.cpp"
 			$File	"hl2\prop_combine_ball.cpp"
 			$File	"hl2\prop_combine_ball.h"
@@ -225,7 +224,6 @@ $Project "Server"
 			$File	"hl2\vehicle_crane.h"
 			$File	"hl2\vehicle_prisoner_pod.cpp"
 			$File	"hl2\vehicle_viewcontroller.cpp"
-			$File	"hl2\vehicle_jeep.cpp"
 			$File	"hl2\weapon_alyxgun.h"
 			$File	"hl2\weapon_annabelle.cpp"
 			$File	"hl2\weapon_bugbait.cpp"
@@ -301,12 +299,6 @@ $Project "Server"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_smg1.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_stunstick.cpp"
 			}
-		}
-		
-		$Folder "JBMod"
-		{
-			$File	"$SRCDIR\game\server\physgun.cpp"
-			$File	"$SRCDIR\game\server\vehicle_jeep.cpp"
 		}
 	}
 }

@@ -25,16 +25,15 @@
 #include "tier0/memdbgon.h"
 
 ConVar phys_gunmass("phys_gunmass", "200");
-ConVar phys_gunvel("phys_gunvel", "3000");
+ConVar phys_gunvel("phys_gunvel", "400");
 ConVar phys_gunforce("phys_gunforce", "5e5" );
 ConVar phys_guntorque("phys_guntorque", "100" );
 ConVar phys_gunglueradius("phys_gunglueradius", "128" );
-ConVar phys_gunrotationspeed("phys_gunrotationspeed", "10");
 
 static int g_physgunBeam;
 #define PHYSGUN_BEAM_SPRITE		"sprites/physbeam.vmt"
 
-#define MAX_PELLETS	999
+#define MAX_PELLETS	16
 
 class CWeaponGravityGun;
 
@@ -47,9 +46,7 @@ public:
 	~CGravityPellet();
 	void Precache()
 	{
-		//to be fair the melon one was for the funnies
-		//SetModelName( MAKE_STRING( "models/props_junk/watermelon01.mdl" ) );
-		SetModelName(MAKE_STRING("models/weapons/w_bugbait.mdl"));
+		SetModelName( MAKE_STRING( "models/weapons/glueblob.mdl" ) );
 		PrecacheModel( STRING( GetModelName() ) );
 		BaseClass::Precache();
 	}
@@ -425,40 +422,28 @@ IMotionEvent::simresult_e CGravControllerPoint::Simulate( IPhysicsMotionControll
 	else
 	{
 		// clamp future velocity to max speed
-		QAngle angles;
-		Vector origin;
-		pObject->GetShadowPosition(&origin, &angles);
-		VMatrix tmp = SetupMatrixOrgAngles(origin, angles);
-		Vector axis;
-		float angle;
-		RotationDeltaAxisAngle(angles, m_targetRotation, axis, angle);
-		
+		Vector nextVel = delta + vel;
+		float nextSpeed = nextVel.Length();
+		if ( nextSpeed > m_maxVel )
+		{
+			nextVel *= (m_maxVel / nextSpeed);
+			delta = nextVel - vel;
+		}
 
-		//delta *= invDeltaTime;
+		delta *= invDeltaTime;
 
-		
+		float linearAccel = delta.Length();
+		if ( linearAccel > m_maxAcceleration )
+		{
+			delta *= m_maxAcceleration / linearAccel;
+		}
 
 		Vector accel;
 		AngularImpulse angAccel;
 		pObject->CalculateForceOffset( delta, world, &accel, &angAccel );
 		
-		
-		linear = delta;
-		//linear -= vel;
-		linear *= invDeltaTime;
-
-		float linearAccel = delta.Length();
-		if (linearAccel > m_maxAcceleration)
-		{
-			delta *= m_maxAcceleration / linearAccel;
-		}
-
-		//linear += accel;
-		//angular += angAccel;
-		//Msg("%f\n",angVel.Dot(axis * angle)/360);
-		angular = WorldToLocalRotation(tmp, axis, angle)*40;
-		angular -= angVel;
-		angular *= invDeltaTime;
+		linear += accel;
+		angular += angAccel;
 	}
 	
 	return SIM_GLOBAL_ACCELERATION;
@@ -750,11 +735,24 @@ void CWeaponGravityGun::EffectUpdate( void )
 	CBaseEntity *pObject = m_hObject;
 	if ( pObject )
 	{
-
-		if ( pOwner->m_nButtons & IN_USE )
+		if ( m_useDown )
 		{
-			//pOwner->SetPhysicsFlag( PFLAG_DIROVERRIDE, true );
-			//pOwner->AddFlag(FL_ATCONTROLS);
+			if ( pOwner->m_afButtonPressed & IN_USE )
+			{
+				m_useDown = false;
+			}
+		}
+		else 
+		{
+			if ( pOwner->m_afButtonPressed & IN_USE )
+			{
+				m_useDown = true;
+			}
+		}
+
+		if ( m_useDown )
+		{
+			pOwner->SetPhysicsFlag( PFLAG_DIROVERRIDE, true );
 			if ( pOwner->m_nButtons & IN_FORWARD )
 			{
 				m_distance = UTIL_Approach( 1024, m_distance, gpGlobals->frametime * 100 );
@@ -763,20 +761,6 @@ void CWeaponGravityGun::EffectUpdate( void )
 			{
 				m_distance = UTIL_Approach( 40, m_distance, gpGlobals->frametime * 100 );
 			}
-			// Add the incremental player yaw to the target transform
-			matrix3x4_t curMatrix, incMatrix, nextMatrix, rightMatrix;
-			AngleMatrix(m_gravCallback.m_targetRotation, curMatrix);
-			float rotspeed = phys_gunrotationspeed.GetFloat() / 100.0;
-			AngleMatrix(QAngle(0, (float)(pOwner->GetLastUserCommand()->mousedx) * rotspeed, 0), incMatrix);
-			MatrixBuildRotationAboutAxis(right, (float)(pOwner->GetLastUserCommand()->mousedy) * rotspeed, rightMatrix);
-			ConcatTransforms(rightMatrix, incMatrix, incMatrix);
-			ConcatTransforms(incMatrix, curMatrix, nextMatrix);
-			MatrixAngles(nextMatrix, m_gravCallback.m_targetRotation);
-
-
-			
-
-			
 		}
 
 		if ( pOwner->m_nButtons & IN_WEAPON1 )
@@ -862,13 +846,13 @@ void CWeaponGravityGun::EffectUpdate( void )
 void CWeaponGravityGun::SoundCreate( void )
 {
 	m_soundState = SS_SCANNING;
-	//SoundStart();
+	SoundStart();
 }
 
 
 void CWeaponGravityGun::SoundDestroy( void )
 {
-	//SoundStop();
+	SoundStop();
 }
 
 
@@ -985,11 +969,7 @@ void CWeaponGravityGun::SoundUpdate( void )
 
 			// blend the "mass" sounds between 50 and 500 kg
 			IPhysicsObject *pPhys = m_hObject->VPhysicsGetObject();
-			if (!pPhys)
-			{
-				SoundStop();
-				return;
-			}
+			
 			float fade = UTIL_LineFraction( pPhys->GetMass(), 50, 500, 1.0 );
 
 			if ( GetParametersForSound( "Weapon_Physgun.LightObject", params, NULL ) )
@@ -1099,7 +1079,7 @@ void CWeaponGravityGun::DeleteActivePellets()
 		g_pEffects->Dust( pPellet->GetAbsOrigin(), forward, 32, 30 );
 
 		// UNDONE: Probably should just do this client side
-		CBeam *pBeam = CBeam::BeamCreate( PHYSGUN_BEAM_SPRITE, 0.25 );
+		CBeam *pBeam = CBeam::BeamCreate( PHYSGUN_BEAM_SPRITE, 1.5 );
 		pBeam->PointEntInit( pPellet->GetAbsOrigin(), pEnt );
 		pBeam->SetEndAttachment( 1 );
 		pBeam->SetBrightness( 255 );
@@ -1111,6 +1091,7 @@ void CWeaponGravityGun::DeleteActivePellets()
 	}
 	m_pelletCount = 0;
 }
+
 void CWeaponGravityGun::CreatePelletAttraction( float radius, CBaseEntity *pObject )
 {
 	int nearPellet = -1;
@@ -1206,7 +1187,7 @@ IPhysicsObject *CWeaponGravityGun::GetPelletPhysObject( int pelletIndex )
 void CWeaponGravityGun::EffectDestroy( void )
 {
 	m_active = false;
-	//SoundStop();
+	SoundStop();
 
 	DetachObject();
 }
@@ -1278,26 +1259,25 @@ void CWeaponGravityGun::PrimaryAttack( void )
 	{
 		SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 		EffectCreate();
-		//SoundCreate();
+		SoundCreate();
 	}
 	else
 	{
 		EffectUpdate();
-		//SoundUpdate();
+		SoundUpdate();
 	}
 }
 
 void CWeaponGravityGun::SecondaryAttack( void )
 {
-	
 	m_flNextSecondaryAttack = gpGlobals->curtime + 0.1;
 	if ( m_active )
 	{
 		EffectDestroy();
-		//SoundDestroy();
+		SoundDestroy();
 		return;
 	}
-	return;
+
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 	Assert( pOwner );
 
@@ -1366,25 +1346,24 @@ void CWeaponGravityGun::WeaponIdle( void )
 	if ( HasWeaponIdleTimeElapsed() )
 	{
 		SendWeaponAnim( ACT_VM_IDLE );
-		
-	}
-	if (m_active)
-	{
-		CBaseEntity* pObject = m_hObject;
-		// pellet is touching object, so glue it
-		if (pObject && m_glueTouching)
+		if ( m_active )
 		{
-			CGravityPellet* pPellet = m_activePellets[m_pelletAttract].pellet;
-			if (pPellet->MakeConstraint(pObject))
+			CBaseEntity *pObject = m_hObject;
+			// pellet is touching object, so glue it
+			if ( pObject && m_glueTouching )
 			{
-				WeaponSound(SPECIAL1);
-				m_flNextPrimaryAttack = gpGlobals->curtime + 0.75;
-				m_activePellets[m_pelletHeld].pellet->MakeInert();
+				CGravityPellet *pPellet = m_activePellets[m_pelletAttract].pellet;
+				if ( pPellet->MakeConstraint( pObject ) )
+				{
+					WeaponSound( SPECIAL1 );
+					m_flNextPrimaryAttack = gpGlobals->curtime + 0.75;
+					m_activePellets[m_pelletHeld].pellet->MakeInert();
+				}
 			}
-		}
 
-		EffectDestroy();  
-		//SoundDestroy();
+			EffectDestroy();
+			SoundDestroy();
+		}
 	}
 }
 
@@ -1442,3 +1421,103 @@ bool CWeaponGravityGun::Reload( void )
 
 	return false;
 }
+
+#define NUM_COLLISION_TESTS 2500
+void CC_CollisionTest( const CCommand &args )
+{
+	if ( !physenv )
+		return;
+
+	Msg( "Testing collision system\n" );
+	int i;
+	CBaseEntity *pSpot = gEntList.FindEntityByClassname( NULL, "info_player_start");
+	Vector start = pSpot->GetAbsOrigin();
+	static Vector *targets = NULL;
+	static bool first = true;
+	static float test[2] = {1,1};
+	if ( first )
+	{
+		targets = new Vector[NUM_COLLISION_TESTS];
+		float radius = 0;
+		float theta = 0;
+		float phi = 0;
+		for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
+		{
+			radius += NUM_COLLISION_TESTS * 123.123;
+			radius = fabs(fmod(radius, 128));
+			theta += NUM_COLLISION_TESTS * 76.76;
+			theta = fabs(fmod(theta, DEG2RAD(360)));
+			phi += NUM_COLLISION_TESTS * 1997.99;
+			phi = fabs(fmod(phi, DEG2RAD(180)));
+			
+			float st, ct, sp, cp;
+			SinCos( theta, &st, &ct );
+			SinCos( phi, &sp, &cp );
+
+			targets[i].x = radius * ct * sp;
+			targets[i].y = radius * st * sp;
+			targets[i].z = radius * cp;
+			
+			// make the trace 1024 units long
+			Vector dir = targets[i] - start;
+			VectorNormalize(dir);
+			targets[i] = start + dir * 1024;
+		}
+		first = false;
+	}
+
+	//Vector results[NUM_COLLISION_TESTS];
+
+	int testType = 0;
+	if ( args.ArgC() >= 2 )
+	{
+		testType = atoi( args[1] );
+	}
+	float duration = 0;
+	Vector size[2];
+	size[0].Init(0,0,0);
+	size[1].Init(16,16,16);
+	unsigned int dots = 0;
+
+	for ( int j = 0; j < 2; j++ )
+	{
+		float startTime = engine->Time();
+		if ( testType == 1 )
+		{
+			const CPhysCollide *pCollide = g_PhysWorldObject->GetCollide();
+			trace_t tr;
+
+			for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
+			{
+				physcollision->TraceBox( start, targets[i], -size[j], size[j], pCollide, vec3_origin, vec3_angle, &tr );
+				dots += physcollision->ReadStat(0);
+				//results[i] = tr.endpos;
+			}
+		}
+		else
+		{
+			testType = 0;
+			CBaseEntity *pWorld = GetContainingEntity( INDEXENT(0) );
+			trace_t tr;
+
+			for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
+			{
+				UTIL_TraceModel( start, targets[i], -size[j], size[j], pWorld, COLLISION_GROUP_NONE, &tr );
+				//results[i] = tr.endpos;
+			}
+		}
+
+		duration += engine->Time() - startTime;
+	}
+	test[testType] = duration;
+	Msg("%d collisions in %.2f ms (%u dots)\n", NUM_COLLISION_TESTS, duration*1000, dots );
+	Msg("Current speed ratio: %.2fX BSP:JGJK\n", test[1] / test[0] );
+#if 0
+	int red = 255, green = 0, blue = 0;
+	for ( i = 0; i < NUM_COLLISION_TESTS; i++ )
+	{
+		NDebugOverlay::Line( start, results[i], red, green, blue, false, 2 );
+	}
+#endif
+}
+static ConCommand collision_test("collision_test", CC_CollisionTest, "Tests collision system", FCVAR_CHEAT );

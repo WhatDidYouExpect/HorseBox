@@ -99,7 +99,6 @@ $Project "vgui_controls"
 		$File	"URLLabel.cpp"
 		$File	"WizardPanel.cpp"
 		$File	"WizardSubPanel.cpp"
-		$File	"SquirrelPanel.cpp"
 		$File   "$SRCDIR/vgui2/src/vgui_key_translation.cpp"
 	}
 
@@ -195,6 +194,5 @@ $Project "vgui_controls"
 		$File	"$SRCDIR\public\tier1\utlvector.h"
 		$File	"$SRCDIR\public\vgui_controls\WizardPanel.h"
 		$File	"$SRCDIR\public\vgui_controls\WizardSubPanel.h"
-		$File	"$SRCDIR\public\vgui_controls\SquirrelPanel.h"
 	}
 }

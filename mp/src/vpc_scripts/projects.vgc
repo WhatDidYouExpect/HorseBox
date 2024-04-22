@@ -135,13 +135,3 @@ $Project "togl"
 {
 	"togl\togl.vpc" [$POSIX]
 }
-
-$Project "launcher"
-{
-	"launcher\launcher.vpc" [$WIN32]
-}
-
-$Project "squirrel"
-{
-	"squirrel\squirrel.vpc" [$WIN32]
-}

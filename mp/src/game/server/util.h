@@ -404,8 +404,6 @@ inline void		UTIL_CenterPrintAll( const char *msg_name, const char *param1 = NUL
 	UTIL_ClientPrintAll( HUD_PRINTCENTER, msg_name, param1, param2, param3, param4 );
 }
 
-CBasePlayer* UTIL_GetNearestPlayer(const Vector& origin);
-
 void UTIL_ValidateSoundName( string_t &name, const char *defaultStr );
 
 void UTIL_ClientPrintFilter( IRecipientFilter& filter, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL );

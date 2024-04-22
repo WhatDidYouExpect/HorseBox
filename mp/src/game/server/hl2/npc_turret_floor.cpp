@@ -1133,7 +1133,7 @@ void CNPC_FloorTurret::AutoSearchThink( void )
 void CNPC_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirToEnemy, bool bStrict )
 {
 	FireBulletsInfo_t info;
-	info.m_pWeapon = this;
+
 	if ( !bStrict && GetEnemy() != NULL )
 	{
 		Vector vecDir = GetActualShootTrajectory( vecSrc );

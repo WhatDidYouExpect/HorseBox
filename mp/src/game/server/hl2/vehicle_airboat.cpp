@@ -1606,7 +1606,6 @@ void CPropAirboat::FireGun( )
 #endif
 
 	FireBulletsInfo_t info;
-	info.m_pWeapon = this;
 	info.m_vecSrc = vecGunPosition;
 	info.m_vecDirShooting = vecRay;
 	info.m_flDistance = 4096;

@@ -32,8 +32,6 @@ public:
 	virtual bool					IsTransparent( void ) { return true; }
 	virtual bool					ShouldReceiveProjectedTextures( int flags ) { return false; }
 	virtual int						DrawModel( int flags );
-	matrix3x4_t worldTransform;
-	const matrix3x4_t& RenderableToWorldTransform() { return worldTransform; }
 
 	// Returns the bounds relative to the origin (render bounds)
 	virtual void	GetRenderBounds( Vector& mins, Vector& maxs )
@@ -54,18 +52,18 @@ public:
 
 class C_WeaponGravityGun : public C_BaseCombatWeapon
 {
-	DECLARE_CLASS(C_WeaponGravityGun, C_BaseCombatWeapon);
+	DECLARE_CLASS( C_WeaponGravityGun, C_BaseCombatWeapon );
 public:
 	C_WeaponGravityGun() {}
 
 	DECLARE_CLIENTCLASS();
 	DECLARE_PREDICTABLE();
 
-	int KeyInput(int down, ButtonCode_t keynum, const char* pszCurrentBinding)
+	int KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 	{
-		if (gHUD.m_iKeyBits & IN_ATTACK)
+		if ( gHUD.m_iKeyBits & IN_ATTACK )
 		{
-			switch (keynum)
+			switch ( keynum )
 			{
 			case MOUSE_WHEEL_UP:
 				gHUD.m_iKeyBits |= IN_WEAPON1;
@@ -78,24 +76,13 @@ public:
 		}
 
 		// Allow engine to process
-		return BaseClass::KeyInput(down, keynum, pszCurrentBinding);
+		return BaseClass::KeyInput( down, keynum, pszCurrentBinding );
 	}
 
-	void OnDataChanged(DataUpdateType_t updateType)
+	void OnDataChanged( DataUpdateType_t updateType )
 	{
-		BaseClass::OnDataChanged(updateType);
-		m_beam.Update(this);
-	}
-
-	virtual void			CreateMove(float flInputSampleTime, CUserCmd* pCmd, const QAngle& vecOldViewAngles)
-	{
-		BaseClass::CreateMove(flInputSampleTime, pCmd, vecOldViewAngles);
-
-		// Block angular movement when IN_ATTACK is pressed
-		if ((pCmd->buttons & IN_ATTACK) && (pCmd->buttons & IN_USE))
-		{
-			VectorCopy(vecOldViewAngles, pCmd->viewangles);
-		}
+		BaseClass::OnDataChanged( updateType );
+		m_beam.Update( this );
 	}
 
 private:
@@ -172,8 +159,7 @@ int	C_BeamQuadratic::DrawModel( int )
 	}
 
 	float scrollOffset = gpGlobals->curtime - (int)gpGlobals->curtime;
-	CMatRenderContextPtr pRenderContext(materials);
-	pRenderContext->Bind(pMat);
+	materials->Bind( pMat );
 	DrawBeamQuadratic( points[0], points[1], points[2], 13, color, scrollOffset );
 	return 1;
 }
